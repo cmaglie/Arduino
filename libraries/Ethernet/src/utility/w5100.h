@@ -7,8 +7,8 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef	W5100_H_INCLUDED
-#define	W5100_H_INCLUDED
+#ifndef	W5x00_H_INCLUDED
+#define	W5x00_H_INCLUDED
 
 #include <SPI.h>
 
@@ -131,7 +131,7 @@ public:
   static const uint8_t RAW  = 255;
 };
 
-class W5100Class {
+class W5x00Class {
 
 public:
   void init();
@@ -198,7 +198,7 @@ private:
   static uint8_t chipset;
   static uint8_t sockets;
 
-  // W5100 Registers
+  // W5x00 Registers
   // ---------------
 private:
   static uint8_t write(uint16_t _addr, uint8_t _cb, uint8_t _data);
@@ -258,7 +258,7 @@ public:
 #undef __GP_REGISTER16
 #undef __GP_REGISTER_N
 
-  // W5100 Socket registers
+  // W5x00 Socket registers
   // ----------------------
 private:
   static inline uint8_t readSn(SOCKET _s, uint16_t _addr);
@@ -358,9 +358,9 @@ private:
 #endif // !SPI_HAS_EXTENDED_CS_PIN_HANDLING
 };
 
-extern W5100Class W5100;
+extern W5x00Class W5100;
 
-uint8_t W5100Class::readSn(SOCKET _s, uint16_t _addr) {
+uint8_t W5x00Class::readSn(SOCKET _s, uint16_t _addr) {
   if (chipset == 1)
     return read(CH_BASE + _s * CH_SIZE + _addr, 0x00);
   if (chipset == 2)
@@ -369,7 +369,7 @@ uint8_t W5100Class::readSn(SOCKET _s, uint16_t _addr) {
     return read(_addr, (_s<<5) + 0x08);
 }
 
-uint8_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t _data) {
+uint8_t W5x00Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t _data) {
   if (chipset == 1)
     return write(CH_BASE + _s * CH_SIZE + _addr, 0x00, _data);
   if (chipset == 2)
@@ -378,7 +378,7 @@ uint8_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t _data) {
     return write(_addr, (_s<<5) + 0x0C, _data);
 }
 
-uint16_t W5100Class::readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _len) {
+uint16_t W5x00Class::readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _len) {
   if (chipset == 1)
     return read(CH_BASE + _s * CH_SIZE + _addr, 0x00, _buf, _len);
   if (chipset == 2)
@@ -387,7 +387,7 @@ uint16_t W5100Class::readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _
     return read(_addr, (_s<<5) + 0x08, _buf, _len);
 }
 
-uint16_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _len) {
+uint16_t W5x00Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _len) {
   if (chipset == 1)
     return write(CH_BASE + _s * CH_SIZE + _addr, 0x00, _buf, _len);
   if (chipset == 2)
@@ -396,39 +396,39 @@ uint16_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t 
     return write(_addr, (_s<<5) + 0x0C, _buf, _len);
 }
 
-void W5100Class::getGatewayIp(uint8_t *_addr) {
+void W5x00Class::getGatewayIp(uint8_t *_addr) {
   readGAR(_addr);
 }
 
-void W5100Class::setGatewayIp(uint8_t *_addr) {
+void W5x00Class::setGatewayIp(uint8_t *_addr) {
   writeGAR(_addr);
 }
 
-void W5100Class::getSubnetMask(uint8_t *_addr) {
+void W5x00Class::getSubnetMask(uint8_t *_addr) {
   readSUBR(_addr);
 }
 
-void W5100Class::setSubnetMask(uint8_t *_addr) {
+void W5x00Class::setSubnetMask(uint8_t *_addr) {
   writeSUBR(_addr);
 }
 
-void W5100Class::getMACAddress(uint8_t *_addr) {
+void W5x00Class::getMACAddress(uint8_t *_addr) {
   readSHAR(_addr);
 }
 
-void W5100Class::setMACAddress(uint8_t *_addr) {
+void W5x00Class::setMACAddress(uint8_t *_addr) {
   writeSHAR(_addr);
 }
 
-void W5100Class::getIPAddress(uint8_t *_addr) {
+void W5x00Class::getIPAddress(uint8_t *_addr) {
   readSIPR(_addr);
 }
 
-void W5100Class::setIPAddress(uint8_t *_addr) {
+void W5x00Class::setIPAddress(uint8_t *_addr) {
   writeSIPR(_addr);
 }
 
-void W5100Class::setRetransmissionTime(uint16_t _timeout) {
+void W5x00Class::setRetransmissionTime(uint16_t _timeout) {
   if (chipset == 1) {
     writeRTR_W5100(_timeout);
   } else if (chipset == 2) {
@@ -438,7 +438,7 @@ void W5100Class::setRetransmissionTime(uint16_t _timeout) {
   }
 }
 
-void W5100Class::setRetransmissionCount(uint8_t _retry) {
+void W5x00Class::setRetransmissionCount(uint8_t _retry) {
   if (chipset == 1) {
     writeRCR_W5100(_retry);
   } else if (chipset == 2) {
