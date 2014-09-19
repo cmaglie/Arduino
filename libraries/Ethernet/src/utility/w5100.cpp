@@ -29,7 +29,7 @@ void W5100Class::init(void)
 {
   delay(300);
 
-#if defined(ARDUINO_ARCH_AVR)
+#if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
   SPI.begin();
   initSS();
 #else
@@ -199,7 +199,7 @@ void W5100Class::read_data(SOCKET s, volatile uint16_t src, volatile uint8_t *ds
 
 uint8_t W5100Class::write(uint16_t _addr, uint8_t _cb, uint8_t _data)
 {
-#if defined(ARDUINO_ARCH_AVR)
+#if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
   setSS();
   if (chipset == 1) {
     SPI.transfer(0xF0);
@@ -235,7 +235,7 @@ uint8_t W5100Class::write(uint16_t _addr, uint8_t _cb, uint8_t _data)
 
 uint16_t W5100Class::write(uint16_t _addr, uint8_t _cb, const uint8_t *_buf, uint16_t _len)
 {
-#if defined(ARDUINO_ARCH_AVR)
+#if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
   if (chipset == 1) {
     for (uint16_t i=0; i<_len; i++)
     {
@@ -288,7 +288,7 @@ uint16_t W5100Class::write(uint16_t _addr, uint8_t _cb, const uint8_t *_buf, uin
 uint8_t W5100Class::read(uint16_t _addr, uint8_t _cb)
 {
   uint8_t res;
-#if defined(ARDUINO_ARCH_AVR)
+#if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
   setSS();
   if (chipset == 1) {
     SPI.transfer(0x0F);
@@ -324,7 +324,7 @@ uint8_t W5100Class::read(uint16_t _addr, uint8_t _cb)
 
 uint16_t W5100Class::read(uint16_t _addr, uint8_t _cb, uint8_t *_buf, uint16_t _len)
 {
-#if defined(ARDUINO_ARCH_AVR)
+#if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
   if (chipset == 1) {
     for (uint16_t i=0; i<_len; i++)
     {
