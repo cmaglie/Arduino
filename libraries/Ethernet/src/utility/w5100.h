@@ -14,6 +14,8 @@
 
 #define SPI_CS 10
 
+// Set clock to 4Mhz (W5100 should support up to about 14Mhz)
+// TODO: set SPI clock to maximum allowed for any chipset
 #if !defined(SPI_HAS_EXTENDED_CS_PIN_HANDLING)
 #define SPI_ETHERNET_SETTINGS SPISettings(4000000, MSBFIRST, SPI_MODE0)
 #else

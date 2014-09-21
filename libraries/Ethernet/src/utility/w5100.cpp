@@ -31,9 +31,6 @@ void W5x00Class::init(void)
   initSS();
 #else
   SPI.begin(SPI_CS);
-  // Set clock to 4Mhz (W5100 should support up to about 14Mhz)
-  SPI.setClockDivider(SPI_CS, 21);
-  SPI.setDataMode(SPI_CS, SPI_MODE0);
 #endif
 
   /*
