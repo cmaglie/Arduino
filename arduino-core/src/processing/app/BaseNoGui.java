@@ -6,8 +6,10 @@ import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
+
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
+
 import processing.app.debug.Compiler;
 import processing.app.debug.*;
 import processing.app.helpers.*;
@@ -575,14 +577,23 @@ public class BaseNoGui {
     Logger.getLogger("javax.jmdns").setLevel(Level.OFF);
   }
 
-  static public void initPackages() throws Exception {
-    indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
-    File indexFile = indexer.getIndexFile();
-    File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
-    if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
-      FileUtils.copyFile(defaultPackageJsonFile, indexFile);
-    } else if (!indexFile.isFile()) {
-      // Otherwise create an empty packages index
+  private static void checkPackageIndexFile(File indexFile) throws IOException,
+      FileNotFoundException {
+    File defaultPackageIndexFile = new File(getContentFile("dist"), "package_index.json");
+    if (indexFile.isFile()) {
+      // Check if the global index is older than the bundled index.
+      if (defaultPackageIndexFile.isFile()
+          && defaultPackageIndexFile.lastModified() > indexFile.lastModified()) {
+        FileUtils.copyFile(defaultPackageIndexFile, indexFile);
+      }
+      return;
+    }
+
+    // If the global index doesn't exist copy the bundled index (if available)
+    // or generate an empty one.
+    if (defaultPackageIndexFile.isFile()) {
+      FileUtils.copyFile(defaultPackageIndexFile, indexFile);
+    } else {
       FileOutputStream out = null;
       try {
         out = new FileOutputStream(indexFile);
@@ -594,6 +605,29 @@ public class BaseNoGui {
         }
       }
     }
+  }
+
+  private static void createDefaultLibrariesIndex(File librariesIndexFile)
+      throws IOException {
+    File defaultLibraryJsonFile = new File(getContentFile("dist"), "library_index.json");
+    if (defaultLibraryJsonFile.isFile()) {
+      FileUtils.copyFile(defaultLibraryJsonFile, librariesIndexFile);
+    } else {
+      try {
+        // Otherwise create an empty packages index
+        FileOutputStream out = new FileOutputStream(librariesIndexFile);
+        out.write("{ \"libraries\" : [ ] }".getBytes());
+        out.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  static public void initPackages() throws Exception {
+    indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
+    File indexFile = indexer.getIndexFile();
+    checkPackageIndexFile(indexFile);
     indexer.parseIndex();
     indexer.syncWithFilesystem(getHardwareFolder());
 
@@ -605,21 +639,8 @@ public class BaseNoGui {
 
     librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
     File librariesIndexFile = librariesIndexer.getIndexFile();
-    if (!librariesIndexFile.isFile()) {
-      File defaultLibraryJsonFile = new File(getContentFile("dist"), "library_index.json");
-      if (defaultLibraryJsonFile.isFile()) {
-        FileUtils.copyFile(defaultLibraryJsonFile, librariesIndexFile);
-      } else {
-        try {
-          // Otherwise create an empty packages index
-          FileOutputStream out = new FileOutputStream(librariesIndexFile);
-          out.write("{ \"libraries\" : [ ] }".getBytes());
-          out.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-    }
+    if (!librariesIndexFile.isFile())
+      createDefaultLibrariesIndex(librariesIndexFile);
     librariesIndexer.parseIndex();
   }
 
