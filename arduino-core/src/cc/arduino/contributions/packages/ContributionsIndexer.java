@@ -81,8 +81,18 @@ public class ContributionsIndexer {
   // }
 
   public void parseIndex() throws IOException {
-    // Parse index file
+    // Parse default index file
     parseIndex(indexFile);
+  }
+
+  public void parseIndex(File indexFile) throws IOException {
+    InputStream indexIn = new FileInputStream(indexFile);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new MrBeanModule());
+    mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+    mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    index = mapper.readValue(indexIn, ContributionsIndex.class);
 
     List<ContributedPackage> packages = index.getPackages();
     for (ContributedPackage pack : packages) {
@@ -96,16 +106,6 @@ public class ContributionsIndexer {
     }
 
     index.fillCategories();
-  }
-
-  private void parseIndex(File indexFile) throws IOException {
-    InputStream indexIn = new FileInputStream(indexFile);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new MrBeanModule());
-    mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-    mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    index = mapper.readValue(indexIn, ContributionsIndex.class);
   }
 
   public void syncWithFilesystem(File hardwareFolder) throws IOException {
