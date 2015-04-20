@@ -68,6 +68,8 @@ public class BaseNoGui {
   static ContributionsIndexer indexer;
   static LibrariesIndexer librariesIndexer;
 
+  private static boolean developersPreview;
+
   // Returns a File object for the given pathname. If the pathname
   // is not absolute, it is interpreted relative to the current
   // directory when starting the IDE (which is not the same as the
@@ -627,9 +629,14 @@ public class BaseNoGui {
 
   static public void initPackages() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
-    File indexFile = indexer.getIndexFile();
-    checkPackageIndexFile(indexFile);
-    indexer.parseIndex();
+    if (!isDevelopersPreview()) {
+      File indexFile = indexer.getIndexFile();
+      checkPackageIndexFile(indexFile);
+      indexer.parseIndex();
+    } else {
+      File devPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
+      indexer.parseIndex(devPackageJsonFile);
+    }
     indexer.syncWithFilesystem(getHardwareFolder());
 
     packages = new HashMap<String, TargetPackage>();
@@ -674,6 +681,9 @@ public class BaseNoGui {
     // help 3rd party installers find the correct hardware path
     PreferencesData.set("last.ide." + VERSION_NAME + ".hardwarepath", getHardwarePath());
     PreferencesData.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);
+
+    File devReleaseTag = new File(getHardwareFolder(), "developers_preview");
+    developersPreview = devReleaseTag.exists();
   }
 
   /**
@@ -1097,6 +1107,15 @@ public class BaseNoGui {
    */
   static public void showWarning(String title, String message, Exception e) {
     notifier.showWarning(title, message, e);
+  }
+
+  /**
+   * Return true if this is a developers pre-release
+   * 
+   * @return
+   */
+  public static boolean isDevelopersPreview() {
+    return developersPreview;
   }
 
 }

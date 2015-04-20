@@ -1285,26 +1285,31 @@ public class Base {
     JMenu boardMenu = new JMenu(_("Board"));
     boardMenu.putClientProperty("removeOnWindowDeactivation", true);
     MenuScroller.setScrollerFor(boardMenu);
-    @SuppressWarnings("serial")
-    Action runInstaller = new AbstractAction(_("Boards Manager...")) {
-      public void actionPerformed(ActionEvent actionevent) {
-        try {
-          openInstallBoardDialog();
-        } catch (Exception e) {
-          //TODO show error
-          e.printStackTrace();
-        }
-      }
-    };
-    boardMenu.add(new JMenuItem(runInstaller));
     boardsCustomMenus.add(boardMenu);
+
+    if (!BaseNoGui.isDevelopersPreview()) {
+      @SuppressWarnings("serial")
+      Action runInstaller = new AbstractAction(_("Boards Manager...")) {
+        public void actionPerformed(ActionEvent actionevent) {
+          try {
+            openInstallBoardDialog();
+          } catch (Exception e) {
+            // TODO show error
+            e.printStackTrace();
+          }
+        }
+      };
+      boardMenu.add(new JMenuItem(runInstaller));
+    }
 
     // If there are no platforms installed we are done
     if (BaseNoGui.packages.size() == 0)
       return;
     
-    // Separate "Install boards..." command from installed boards
-    boardMenu.add(new JSeparator());
+    if (!BaseNoGui.isDevelopersPreview()) {
+      // Separate "Boards manager..." command from installed boards
+      boardMenu.add(new JSeparator());
+    }
 
     // Generate custom menus for all platforms
     Set<String> customMenusTitles = new HashSet<String>();

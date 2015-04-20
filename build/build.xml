@@ -73,6 +73,27 @@
     <antcall target="${platform}-dist" />
   </target>
 
+  <!-- Create a "Developers Preview" distribution: all hardware -->
+  <!-- cores are bundled and the boards manager is disabled     -->
+
+  <target name="build-dev" description="Build Arduino in Developers Preview mode">
+    <property name="full_bundle" value="1" />
+    <property name="developers_preview" value="1" />
+    <antcall target="build" />
+  </target>
+
+  <target name="run-dev" description="Run Arduino in Developers Preview mode">
+    <property name="full_bundle" value="1" />
+    <property name="developers_preview" value="1" />
+    <antcall target="run" />
+  </target>
+
+  <target name="dist-dev" description="Build Arduino for distribution in Developers Preview mode">
+    <property name="full_bundle" value="1" />
+    <property name="developers_preview" value="1" />
+    <antcall target="dist" />
+  </target>
+
   <!-- "§$§$&, ant doesn't have a built-in help target :(  -->
   <target name="help" description="Show project help">
     <java classname="org.apache.tools.ant.Main">
@@ -160,12 +181,38 @@
   </target>
 
   <!-- copy hardware folder -->
-  <target name="assemble-hardware" unless="light_bundle">
+  <target name="assemble-hardware">
+    <antcall target="assemble-hardware-light-bundle" />
+    <antcall target="assemble-hardware-standard-bundle" />
+    <antcall target="assemble-hardware-full-bundle" />
+    <antcall target="assemble-hardware-developers-preview" />
+  </target>
+
+  <!-- create light bundle -->
+  <target name="assemble-hardware-light-bundle" if="light_bundle">
+  </target>
+
+  <!-- create standard bundle -->
+  <target name="assemble-hardware-standard-bundle" unless="light_bundle, full_bundle">
     <copy todir="${target.path}/hardware">
       <fileset dir="../hardware">
-        <exclude name="arduino/sam/**"/>
+        <include name="arduino/avr/**"/>
       </fileset>
     </copy>
+  </target>
+
+  <!-- create full bundle -->
+  <target name="assemble-hardware-full-bundle" if="full_bundle">
+    <copy todir="${target.path}/hardware">
+      <fileset dir="../hardware">
+        <include name="arduino/**"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- tag distribution as a developers-release -->
+  <target name="assemble-hardware-developers-preview" if="developers_preview">
+    <echo append="true" file="${target.path}/hardware/developers_preview" message=""/>
   </target>
 
   <!-- - - - - - - - - -->
