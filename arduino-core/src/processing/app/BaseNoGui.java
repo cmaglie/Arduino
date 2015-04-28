@@ -3,6 +3,7 @@ package processing.app;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.ContributedTool;
 import cc.arduino.contributions.packages.ContributionsIndexer;
+import cc.arduino.contributions.packages.DownloadableContribution;
 import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
@@ -785,7 +786,12 @@ public class BaseNoGui {
     PreferencesData.removeAllKeysWithPrefix(prefix);
 
     for (ContributedTool tool : indexer.getInstalledTools()) {
-      String path = tool.getDownloadableContribution().getInstalledFolder().getAbsolutePath();
+      DownloadableContribution contribution = tool.getDownloadableContribution();
+      File installedFolder = contribution.getInstalledFolder();
+      if (installedFolder == null)
+        throw new RuntimeException("Can't find tool " + tool.getName() + " "
+                                   + tool.getVersion());
+      String path = installedFolder.getAbsolutePath();
       PreferencesData.set(prefix + tool.getName() + ".path", path);
       PreferencesData.set(prefix + tool.getName() + "-" + tool.getVersion() + ".path", path);
     }
