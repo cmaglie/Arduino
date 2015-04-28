@@ -393,6 +393,8 @@
 
     <antcall target="macosx-build-common-avr-toolchain" />
 
+    <antcall target="macosx-build-full-bundle-tools" />
+
     <antcall target="assemble">
       <param name="target.path" value="${staging_folder}/work/${staging_hardware_folder}/.." />
     </antcall>
@@ -424,6 +426,26 @@
       <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/bin/*"/>
       <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/libexec/gcc/avr/4.8.1/*"/>
     </chmod>
+  </target>
+
+  <target name="macosx-build-full-bundle-tools" if="full_bundle">
+    <!-- Unzip bossac -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/bossac-1.5-arduino2-i386-apple-darwin14.3.0.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/bossac-1.5-arduino2-i386-apple-darwin14.3.0.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/bossac-1.5-arduino" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.bossac=1.5-arduino" />
+    </antcall>
+
+    <!-- Unzip ARM GCC -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.arm-none-eabi-gcc=4.8.3-2014q1" />
+    </antcall>
   </target>
 
   <target name="macosx-old-run" depends="macosx-old-build" description="Run Mac OS X version">
@@ -656,7 +678,7 @@
     <chmod perm="755" file="linux/work/lib/libastylej.so" />
   </target>
 
-  <target name="linux32-build" depends="linux-build" unless="light_bundle" description="Build linux (32-bit) version">
+  <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
@@ -664,15 +686,59 @@
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
       <param name="avrdude_version" value="6.0.1-arduino5"/>
     </antcall>
+
+    <antcall target="linux32-build-full-bundle-tools" />
   </target>
 
-  <target name="linux64-build" depends="linux-build"  unless="light_bundle" description="Build linux (64-bit) version">
+  <target name="linux32-build-full-bundle-tools" if="full_bundle">
+    <!-- Unzip ARM GCC -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.arm-none-eabi-gcc=4.8.3-2014q1" />
+    </antcall>
+
+    <!-- Unzip bossac -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/bossac-1.5-arduino2-i486-linux-gnu.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/bossac-1.5-arduino2-i486-linux-gnu.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/bossac-1.5-arduino" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.bossac=1.5-arduino" />
+    </antcall>
+  </target>
+
+  <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
       <param name="gcc_version" value="4.8.1-arduino5"/>
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
       <param name="avrdude_version" value="6.0.1-arduino5"/>
+    </antcall>
+
+    <antcall target="linux64-build-full-bundle-tools" />
+  </target>
+
+  <target name="linux64-build-full-bundle-tools" if="full_bundle">
+    <!-- Unzip ARM GCC -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.arm-none-eabi-gcc=4.8.3-2014q1" />
+    </antcall>
+
+    <!-- Unzip bossac -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/bossac-1.5-arduino2-x86_64-linux-gnu.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/bossac-1.5-arduino2-x86_64-linux-gnu.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/bossac-1.5-arduino" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.bossac=1.5-arduino" />
     </antcall>
   </target>
 
@@ -845,7 +911,15 @@
       <fileset dir="windows/dist" includes="drivers/**" />
     </copy>
 
-    <antcall target="windows-build-avr-toolchain" />
+    <antcall target="avr-toolchain-bundle">
+      <param name="unpack_target" value="unzip"/>
+      <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-mingw32.zip"/>
+      <param name="gcc_version" value="4.8.1-arduino5"/>
+      <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i686-mingw32.zip"/>
+      <param name="avrdude_version" value="6.0.1-arduino5"/>
+    </antcall>
+
+    <antcall target="windows-build-full-bundle-tools" />
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.05.zip" />
@@ -857,7 +931,7 @@
     <copy file="windows/msvcp100.dll" todir="windows/work" />
     <copy file="windows/msvcr100.dll" todir="windows/work" />
 
-    <!-- Copy listComPort.exe tool -->
+    <!-- Copy listComPorts tool -->
     <copy todir="windows/work/hardware/tools">
       <fileset file="windows/listComPorts.exe" />
     </copy>
@@ -892,13 +966,23 @@
     </chmod>
   </target>
 
-  <target name="windows-build-avr-toolchain">
-    <antcall target="avr-toolchain-bundle">
-      <param name="unpack_target" value="unzip"/>
-      <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-mingw32.zip"/>
-      <param name="gcc_version" value="4.8.1-arduino5"/>
-      <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i686-mingw32.zip"/>
-      <param name="avrdude_version" value="6.0.1-arduino5"/>
+  <target name="windows-build-full-bundle-tools" if="full_bundle">
+    <!-- Unzip ARM GCC -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.arm-none-eabi-gcc=4.8.3-2014q1" />
+    </antcall>
+
+    <!-- Unzip bossac -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/bossac-1.5-arduino2-mingw32.tar.gz" />
+      <param name="archive_url" value="http://downloads.arduino.cc/bossac-1.5-arduino2-mingw32.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/bossac-1.5-arduino" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+      <param name="bundle_version" value="arduino.bossac=1.5-arduino" />
     </antcall>
   </target>
 
