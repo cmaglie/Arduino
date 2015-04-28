@@ -718,6 +718,7 @@
       <arg value="${archive_file}"/>
       <arg value="--directory=${dest_folder}"/>
     </exec>
+    <antcall target="add-bundle-version" />
   </target>
 
   <target name="unzip" depends="untar-unzip-checksum" unless="${archive_file}_installed">
@@ -730,12 +731,18 @@
       <arg value="${dest_folder}" />
       <arg value="${archive_file}" />
     </exec>
+    <antcall target="add-bundle-version" />
   </target>
 
   <target name="unzip-with-ant-task" depends="untar-unzip-checksum" unless="${archive_file}_installed">
     <echo>Unzipping ${archive_file} into folder ${dest_folder}</echo>
     <mkdir dir="${dest_folder}" />
     <unzip src="${archive_file}" dest="${dest_folder}"/>
+  </target>
+
+  <target name="add-bundle-version" if="bundle_version">
+    <echo>Adding bundle tag "${bundle_version}" into folder ${final_folder}</echo>
+    <echo append="true" file="${final_folder}/builtin_tools_versions.txt" message="${bundle_version}"/>
   </target>
 
   <target name="linux-dist" depends="build"
