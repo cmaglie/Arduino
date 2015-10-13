@@ -35,6 +35,7 @@ protected:
   virtual bool setup(USBSetup& setup) = 0;
   virtual int getInterface(uint8_t* interfaceCount) = 0;
   virtual int getDescriptor(USBSetup& setup) = 0;
+  virtual char* getShortName(void) = 0;
 
   uint8_t pluggedInterface;
   uint8_t pluggedEndpoint;
@@ -55,10 +56,12 @@ public:
   int getInterface(uint8_t* interfaceCount);
   int getDescriptor(USBSetup& setup);
   bool setup(USBSetup& setup);
+  char* getShortName(void);
 
 private:
   uint8_t lastIf;
   uint8_t lastEp;
+  char _iSerialNum[20] = {0};
   PluggableUSBModule* rootNode;
 };
 

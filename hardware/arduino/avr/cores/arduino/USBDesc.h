@@ -39,6 +39,6 @@
 #define CDC_RX CDC_ENDPOINT_OUT
 #define CDC_TX CDC_ENDPOINT_IN
 
-#define IMANUFACTURER	1
-#define IPRODUCT		2
-
+#define IMANUFACTURER   1
+#define IPRODUCT        2
+#define ISERIAL         3
