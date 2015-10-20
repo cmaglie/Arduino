@@ -96,7 +96,7 @@ protected:
   int getInterface(uint8_t* interfaceCount);
   int getDescriptor(USBSetup& setup);
   bool setup(USBSetup& setup);
-  char* getShortName(void);
+  uint8_t getShortName(char* name);
 
 private:
   uint8_t epType[1];
