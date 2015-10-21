@@ -505,7 +505,7 @@ bool SendDescriptor(USBSetup& setup)
 		else if (setup.wValueL == ISERIAL) {
 #ifdef PLUGGABLE_USB_ENABLED
 			char name[ISERIAL_MAX_LEN];
-			PluggableUSB().getShortName(name, sizeof(name));
+			PluggableUSB().getShortName(name);
 			return USB_SendStringDescriptor((uint8_t*)name, strlen(name), 0);
 #endif
 		}

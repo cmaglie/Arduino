@@ -50,15 +50,13 @@ int PluggableUSB_::getDescriptor(USBSetup& setup)
 	return 0;
 }
 
-uint8_t PluggableUSB_::getShortName(char* _iSerialNum, uint8_t max_len)
+void PluggableUSB_::getShortName(char *iSerialNum)
 {
-	uint8_t ret = 0;
-	memset(_iSerialNum, 0, max_len);
 	PluggableUSBModule* node;
-	for (node = rootNode; node && ret < max_len; node = node->next) {
-		ret += node->getShortName(&_iSerialNum[ret]);
+	for (node = rootNode; node; node = node->next) {
+		iSerialNum += node->getShortName(iSerialNum);
 	}
-	return ret;
+	*iSerialNum = 0;
 }
 
 bool PluggableUSB_::setup(USBSetup& setup)

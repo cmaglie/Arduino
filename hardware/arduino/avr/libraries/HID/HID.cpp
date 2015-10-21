@@ -57,13 +57,14 @@ int HID_::getDescriptor(USBSetup& setup)
 	return total;
 }
 
-uint8_t HID_::getShortName(char* name)
+uint8_t HID_::getShortName(char *name)
 {
-	char num[3];
-	memcpy(name, "HID", 3);
-	itoa(descriptorSize, num, 10);
-	memcpy(&name[3], num, 3);
-	return strlen(name);
+	name[0] = 'H';
+	name[1] = 'I';
+	name[2] = 'D';
+	name[3] = 'A' + (descriptorSize & 0x0F);
+	name[4] = 'A' + ((descriptorSize >> 4) & 0x0F);
+	return 5;
 }
 
 void HID_::AppendDescriptor(HIDSubDescriptor *node)
