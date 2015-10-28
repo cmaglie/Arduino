@@ -24,6 +24,7 @@
 	<classpathentry kind="lib" path="test-lib/fest-reflect-1.2.jar"/>
 	<classpathentry kind="lib" path="test-lib/fest-swing-1.2.jar"/>
 	<classpathentry kind="lib" path="test-lib/fest-util-1.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/autocomplete-2.5.8.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/arduino-core"/>
 	<classpathentry kind="lib" path="test-lib/jcip-annotations-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar"/>

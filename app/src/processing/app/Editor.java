@@ -22,6 +22,7 @@
 
 package processing.app;
 
+import cc.arduino.autocomplete.InoCompletionProvider;
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.MonitorFactory;
 import cc.arduino.packages.Uploader;
@@ -31,6 +32,8 @@ import cc.arduino.view.StubMenuListener;
 import cc.arduino.view.findreplace.FindReplace;
 import com.jcraft.jsch.JSchException;
 import jssc.SerialPortException;
+
+import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
@@ -363,6 +366,11 @@ public class Editor extends JFrame implements RunnerListener {
 
     // All set, now show the window
     //setVisible(true);
+    
+    // Add auto-completion provider to the textarea
+    InoCompletionProvider completionProvider = new InoCompletionProvider(sketch);
+    AutoCompletion ac = new AutoCompletion(completionProvider);
+    ac.install(textarea);
   }
 
 
@@ -1059,6 +1067,7 @@ public class Editor extends JFrame implements RunnerListener {
     ToolTipManager.sharedInstance().registerComponent(textArea);
 
     configurePopupMenu(textArea);
+
     return textArea;
   }
 
