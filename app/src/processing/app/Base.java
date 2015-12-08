@@ -610,7 +610,7 @@ public class Base {
           activeEditor.getCurrentTab().getTextArea().setCaretPosition(previousCaretPosition);
         }
       } catch (IOException e) {
-        // noop
+        System.err.println(e);
       }
     }
 
