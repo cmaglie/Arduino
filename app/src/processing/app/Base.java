@@ -759,8 +759,6 @@ public class Base {
     if (!activeEditor.checkModified()) {
       return;  // sketch was modified, and user canceled
     }
-    // Close the running window, avoid window boogers with multiple sketches
-    activeEditor.internalCloseRunner();
 
     // Actually replace things
     handleNewReplaceImpl();
@@ -785,8 +783,6 @@ public class Base {
     if (!activeEditor.checkModified()) {
       return;  // sketch was modified, and user canceled
     }
-    // Close the running window, avoid window boogers with multiple sketches
-    activeEditor.internalCloseRunner();
 
     boolean loaded = activeEditor.handleOpenInternal(file);
     if (!loaded) {
@@ -944,9 +940,6 @@ public class Base {
       return false;
     }
 
-    // Close the running window, avoid window boogers with multiple sketches
-    editor.internalCloseRunner();
-
     if (editors.size() == 1) {
       storeSketches();
 
@@ -1002,10 +995,6 @@ public class Base {
     }
 
     if (handleQuitEach()) {
-      // make sure running sketches close before quitting
-      for (Editor editor : editors) {
-        editor.internalCloseRunner();
-      }
       // Save out the current prefs state
       PreferencesData.save();
 
