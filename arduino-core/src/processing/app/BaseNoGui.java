@@ -14,7 +14,6 @@ import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
@@ -30,7 +29,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -123,18 +121,6 @@ public class BaseNoGui {
       return "";  // use distribution provided avr tools if bundled tools missing
     }
     return path;
-  }
-
-  static public File getBuildFolder(Sketch data) throws IOException {
-    File buildFolder;
-    if (PreferencesData.get("build.path") != null) {
-      buildFolder = absoluteFile(PreferencesData.get("build.path"));
-      Files.createDirectories(buildFolder.toPath());
-    } else {
-      buildFolder = FileUtils.createTempFolder("build", DigestUtils.md5Hex(data.getMainFilePath()) + ".tmp");
-      DeleteFilesOnShutdown.add(buildFolder);
-    }
-    return buildFolder;
   }
 
   static public PreferencesMap getBoardPreferences() {
@@ -509,7 +495,6 @@ public class BaseNoGui {
           //   SketchData data = new SketchData(file);
           //   File tempBuildFolder = getBuildFolder();
           Sketch data = new Sketch(absoluteFile(parser.getFilenames().get(0)));
-          File tempBuildFolder = getBuildFolder(data);
 
           // Sketch.exportApplet()
           //  - calls Sketch.prepare() that calls Sketch.ensureExistence()
@@ -518,7 +503,7 @@ public class BaseNoGui {
           if (!data.getFolder().exists()) {
             showError(tr("No sketch"), tr("Can't find the sketch in the specified path"), null);
           }
-          String suggestedClassName = new Compiler(data, tempBuildFolder.getAbsolutePath()).build(null, false);
+          String suggestedClassName = new Compiler(data).build(null, false);
           if (suggestedClassName == null) {
             showError(tr("Error while verifying"), tr("An error occurred while verifying the sketch"), null);
           }
@@ -527,7 +512,7 @@ public class BaseNoGui {
           Uploader uploader = new UploaderUtils().getUploaderByPreferences(parser.isNoUploadPort());
           if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) showError("...", "...", null);
           try {
-            success = new UploaderUtils().upload(data, uploader, tempBuildFolder.getAbsolutePath(), suggestedClassName, parser.isDoUseProgrammer(), parser.isNoUploadPort(), warningsAccumulator);
+            success = new UploaderUtils().upload(data, uploader, suggestedClassName, parser.isDoUseProgrammer(), parser.isNoUploadPort(), warningsAccumulator);
             showMessage(tr("Done uploading"), tr("Done uploading"));
           } finally {
             if (uploader.requiresAuthorization() && !success) {
@@ -555,7 +540,6 @@ public class BaseNoGui {
             //   File tempBuildFolder = getBuildFolder();
             //   data.load();
             Sketch data = new Sketch(absoluteFile(path));
-            File tempBuildFolder = getBuildFolder(data);
 
             // Sketch.prepare() calls Sketch.ensureExistence()
             // Sketch.build(verbose) calls Sketch.ensureExistence() and set progressListener and, finally, calls Compiler.build()
@@ -563,7 +547,7 @@ public class BaseNoGui {
             //    if (!data.getFolder().exists()) showError(...);
             //    String ... = Compiler.build(data, tempBuildFolder.getAbsolutePath(), tempBuildFolder, null, verbose);
             if (!data.getFolder().exists()) showError(tr("No sketch"), tr("Can't find the sketch in the specified path"), null);
-            String suggestedClassName = new Compiler(data, tempBuildFolder.getAbsolutePath()).build(null, false);
+            String suggestedClassName = new Compiler(data).build(null, false);
             if (suggestedClassName == null) showError(tr("Error while verifying"), tr("An error occurred while verifying the sketch"), null);
             showMessage(tr("Done compiling"), tr("Done compiling"));
           } catch (Exception e) {
