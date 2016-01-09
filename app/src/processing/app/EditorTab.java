@@ -33,7 +33,6 @@ import java.io.IOException;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
 import javax.swing.border.MatteBorder;
@@ -65,7 +64,7 @@ import processing.app.tools.DiscourseFormat;
 /**
  * Single tab, editing a single file, in the main window.
  */
-public class EditorTab extends JPanel implements SketchFile.TextStorage {
+public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
   protected Editor editor;
   protected SketchTextArea textarea;
   protected RTextScrollPane scrollPane;
@@ -89,7 +88,7 @@ public class EditorTab extends JPanel implements SketchFile.TextStorage {
    */
   public EditorTab(Editor editor, SketchFile file, String contents)
       throws IOException {
-    super(new BorderLayout());
+    setLayout(new BorderLayout());
 
     // Load initial contents contents from file if nothing was specified.
     if (contents == null) {

@@ -227,7 +227,7 @@ public class EditorHeader extends JComponent {
     g.setColor(backgroundColor);
     g.fillRect(0, 0, imageW, imageH);
 
-    List<EditorTab> tabs = editor.getTabs();
+    List<EditorTabI> tabs = editor.getTabs();
 
     int codeCount = tabs.size();
     if ((tabLeft == null) || (tabLeft.length < codeCount)) {
@@ -237,7 +237,7 @@ public class EditorHeader extends JComponent {
 
     int x = 6; // offset from left edge of the component
     int i = 0;
-    for (EditorTab tab : tabs) {
+    for (EditorTabI tab : tabs) {
       SketchFile file = tab.getSketchFile();
       String filename = file.getPrettyName();
 
@@ -319,7 +319,7 @@ public class EditorHeader extends JComponent {
       menu.addSeparator();
 
       int i = 0;
-      for (EditorTab tab : editor.getTabs()) {
+      for (EditorTabI tab : editor.getTabs()) {
         SketchFile file = tab.getSketchFile();
         final int index = i++;
         item = new JMenuItem(file.getPrettyName());

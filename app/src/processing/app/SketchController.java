@@ -538,11 +538,9 @@ public class SketchController {
     if (!sourceFile.equals(destFile)) {
       try {
         Base.copyFile(sourceFile, destFile);
-
       } catch (IOException e) {
-        Base.showWarning(tr("Error adding file"),
-                         I18n.format(tr("Could not add ''{0}'' to the sketch."), filename),
-			 e);
+        Base.showWarning(tr("Error adding file"), I18n
+            .format(tr("Could not add ''{0}'' to the sketch."), filename), e);
         return false;
       }
     }

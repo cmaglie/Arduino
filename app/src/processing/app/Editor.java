@@ -81,7 +81,7 @@ public class Editor extends JFrame implements RunnerListener {
   private JMenu recentSketchesMenu;
   private JMenu programmersMenu;
   private final Box upper;
-  private ArrayList<EditorTab> tabs = new ArrayList<>();
+  private ArrayList<EditorTabI> tabs = new ArrayList<>();
   private int currentTabIndex = -1;
 
   private static class ShouldSaveIfModified
@@ -478,7 +478,7 @@ public class Editor extends JFrame implements RunnerListener {
     boolean external = PreferencesData.getBoolean("editor.external");
     saveMenuItem.setEnabled(!external);
     saveAsMenuItem.setEnabled(!external);
-    for (EditorTab tab: tabs)
+    for (EditorTabI tab: tabs)
       tab.applyPreferences();
   }
 
@@ -979,7 +979,7 @@ public class Editor extends JFrame implements RunnerListener {
 	}
 
   public void updateKeywords(PdeKeywords keywords) {
-    for (EditorTab tab : tabs)
+    for (EditorTabI tab : tabs)
       tab.updateKeywords(keywords);
   }
 
@@ -1592,7 +1592,7 @@ public class Editor extends JFrame implements RunnerListener {
   /**
    * Gets the currently displaying tab.
    */
-  public EditorTab getCurrentTab() {
+  public EditorTabI getCurrentTab() {
     return tabs.get(currentTabIndex);
   }
 
@@ -1606,7 +1606,7 @@ public class Editor extends JFrame implements RunnerListener {
   /**
    * Returns an (unmodifiable) list of currently opened tabs.
    */
-  public List<EditorTab> getTabs() {
+  public List<EditorTabI> getTabs() {
     return Collections.unmodifiableList(tabs);
   }
 
@@ -1647,7 +1647,7 @@ public class Editor extends JFrame implements RunnerListener {
     selectTab((currentTabIndex - 1 + tabs.size()) % tabs.size());
   }
 
-  public EditorTab findTab(final SketchFile file) {
+  public EditorTabI findTab(final SketchFile file) {
     return tabs.get(findTabIndex(file));
   }
 
@@ -1711,7 +1711,7 @@ public class Editor extends JFrame implements RunnerListener {
    * @throws IOException
    */
   protected void addTab(SketchFile file, String contents) throws IOException {
-    EditorTab tab = new EditorTab(this, file, contents);
+    EditorTabI tab = new EditorTab(this, file, contents);
     tabs.add(tab);
   }
 
@@ -1805,7 +1805,7 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
   public void removeAllLineHighlights() {
-    for (EditorTab tab : tabs)
+    for (EditorTabI tab : tabs)
       tab.getTextArea().removeAllLineHighlights();
   }
 
