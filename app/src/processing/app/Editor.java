@@ -1691,7 +1691,7 @@ public class Editor extends JFrame implements RunnerListener {
     tabs.ensureCapacity(sketch.getCodeCount());
     for (SketchFile file : sketch.getFiles()) {
       try {
-        addTab(file, null);
+        addTab(file);
       } catch(IOException e) {
         // TODO: Improve / move error handling
         System.err.println(e);
@@ -1705,13 +1705,10 @@ public class Editor extends JFrame implements RunnerListener {
    *
    * @param file
    *          The file to show in the tab.
-   * @param contents
-   *          The contents to show in the tab, or null to load the contents from
-   *          the given file.
    * @throws IOException
    */
-  protected void addTab(SketchFile file, String contents) throws IOException {
-    EditorTabI tab = new EditorTab(this, file, contents);
+  protected void addTab(SketchFile file) throws IOException {
+    EditorTabI tab = new EditorTab(this, file);
     tabs.add(tab);
   }
 

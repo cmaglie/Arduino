@@ -199,7 +199,7 @@ public class SketchController {
       SketchFile file;
       try {
         file = sketch.addFile(newName);
-        editor.addTab(file, "");
+        editor.addTab(file);
       } catch (IOException e) {
         // This does not pass on e, to prevent showing a backtrace for
         // "normal" errors.
@@ -554,7 +554,7 @@ public class SketchController {
         SketchFile sketchFile;
         try {
           sketchFile = sketch.addFile(destFile.getName());
-          editor.addTab(sketchFile, null);
+          editor.addTab(sketchFile);
         } catch (IOException e) {
           // This does not pass on e, to prevent showing a backtrace for
           // "normal" errors.

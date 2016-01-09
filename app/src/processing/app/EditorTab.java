@@ -76,33 +76,26 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
   /**
    * Create a new EditorTab
    *
-   * @param editor
+   * @param parentEditor
    *          The Editor this tab runs in
-   * @param file
+   * @param sketchFile
    *          The file to display in this tab
-   * @param contents
-   *          Initial contents to display in this tab. Can be used when editing
-   *          a file that doesn't exist yet. If null is passed, code.load() is
-   *          called and displayed instead.
    * @throws IOException
    */
-  public EditorTab(Editor editor, SketchFile file, String contents)
+  public EditorTab(Editor parentEditor, SketchFile sketchFile)
       throws IOException {
     setLayout(new BorderLayout());
+    modified = false;
+    editor = parentEditor;
+    file = sketchFile;
 
     // Load initial contents contents from file if nothing was specified.
-    if (contents == null) {
+    String contents = "";
+    if (file.fileExists())
       contents = file.load();
-      modified = false;
-    } else {
-      modified = true;
-    }
-
-    this.editor = editor;
-    this.file = file;
     RSyntaxDocument document = createDocument(contents);
-    this.textarea = createTextArea(document);
-    this.scrollPane = createScrollPane(this.textarea);
+    textarea = createTextArea(document);
+    scrollPane = createScrollPane(this.textarea);
     file.setStorage(this);
     applyPreferences();
     add(this.scrollPane, BorderLayout.CENTER);
