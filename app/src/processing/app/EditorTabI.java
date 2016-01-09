@@ -30,6 +30,8 @@
 
 package processing.app;
 
+import java.io.IOException;
+
 import javax.swing.JPanel;
 import javax.swing.undo.UndoManager;
 
@@ -37,6 +39,20 @@ import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.SketchTextArea;
 
 public abstract class EditorTabI extends JPanel {
+
+  protected SketchFile file;
+
+  public EditorTabI(Editor parentEditor, SketchFile sketchFile)
+      throws IOException {
+    file = sketchFile;
+  }
+  
+  /**
+   * Get the SketchFile that is being edited/viewed in this tab.
+   */
+  public SketchFile getSketchFile() {
+    return this.file;
+  }
 
   abstract public void updateKeywords(PdeKeywords keywords);
   
@@ -72,6 +88,4 @@ public abstract class EditorTabI extends JPanel {
   abstract public void setSelectedText(String what);
   
   abstract public void goToLine(int line);
-  
-  abstract public SketchFile getSketchFile();
 }

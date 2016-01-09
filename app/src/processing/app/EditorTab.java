@@ -68,7 +68,6 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
   protected Editor editor;
   protected SketchTextArea textarea;
   protected RTextScrollPane scrollPane;
-  protected SketchFile file;
   protected boolean modified;
   /** Is external editing mode currently enabled? */
   protected boolean external;
@@ -84,10 +83,10 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
    */
   public EditorTab(Editor parentEditor, SketchFile sketchFile)
       throws IOException {
+    super(parentEditor, sketchFile);
     setLayout(new BorderLayout());
     modified = false;
     editor = parentEditor;
-    file = sketchFile;
 
     // Load initial contents contents from file if nothing was specified.
     String contents = "";
@@ -355,13 +354,6 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
    */
   public SketchController getSketch() {
     return editor.getSketchController();
-  }
-  
-  /**
-   * Get the SketchFile that is being edited in this tab.
-   */
-  public SketchFile getSketchFile() {
-    return this.file;
   }
   
   /**
