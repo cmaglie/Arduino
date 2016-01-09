@@ -28,6 +28,7 @@ import static processing.app.I18n.tr;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import javax.swing.Action;
@@ -54,7 +55,9 @@ import org.fife.ui.rtextarea.Gutter;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.RUndoManager;
 
+import cc.arduino.view.GoToLineNumber;
 import processing.app.helpers.DocumentTextChangeListener;
+import processing.app.helpers.Keys;
 import processing.app.syntax.ArduinoTokenMakerFactory;
 import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.SketchTextArea;
@@ -175,6 +178,52 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     return textArea;
   }
   
+  private JMenuItem editMenuEntries[] = null;
+
+  @Override
+  public JMenuItem[] getEditMenuEntries() {
+    if (editMenuEntries != null)
+      return editMenuEntries;
+
+    // TODO "cut" and "copy" should really only be enabled
+    // if some text is currently selected
+    JMenuItem cut = new JMenuItem(tr("Cut"));
+    cut.setAccelerator(Keys.ctrl(KeyEvent.VK_X));
+    cut.addActionListener(e -> handleCut());
+
+    JMenuItem copy = new JMenuItem(tr("Copy"));
+    copy.setAccelerator(Keys.ctrl(KeyEvent.VK_C));
+    copy.addActionListener(e -> getTextArea().copy());
+
+    JMenuItem copyForForum = new JMenuItem(tr("Copy for Forum"));
+    copyForForum.setAccelerator(Keys.ctrlShift(KeyEvent.VK_C));
+    copyForForum.addActionListener(e -> handleHTMLCopy());
+
+    JMenuItem copyAsHTML = new JMenuItem(tr("Copy as HTML"));
+    copyAsHTML.setAccelerator(Keys.alt(KeyEvent.VK_C));
+    copyAsHTML.addActionListener(e -> handleDiscourseCopy());
+
+    JMenuItem paste = new JMenuItem(tr("Paste"));
+    paste.setAccelerator(Keys.ctrl(KeyEvent.VK_V));
+    paste.addActionListener(e -> handlePaste());
+
+    JMenuItem selectAll = new JMenuItem(tr("Select All"));
+    selectAll.setAccelerator(Keys.ctrl(KeyEvent.VK_A));
+    selectAll.addActionListener(e -> handleSelectAll());
+
+    JMenuItem gotoLine = new JMenuItem(tr("Go to line..."), 'L');
+    gotoLine.setAccelerator(Keys.ctrl(KeyEvent.VK_L));
+    gotoLine.addActionListener(e -> {
+      GoToLineNumber goToLineNumber = new GoToLineNumber(editor);
+      goToLineNumber.setLocationRelativeTo(editor);
+      goToLineNumber.setVisible(true);
+    });
+
+    editMenuEntries = new JMenuItem[] { //
+        cut, copy, copyForForum, copyAsHTML, paste, selectAll, gotoLine };
+    return editMenuEntries;
+  }
+
   private void configurePopupMenu(final SketchTextArea textarea){
 
     JPopupMenu menu = textarea.getPopupMenu();

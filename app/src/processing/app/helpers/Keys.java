@@ -230,4 +230,17 @@ public class Keys {
   public static KeyStroke ctrlAlt(int keyCode) {
     return KeyStroke.getKeyStroke(keyCode, CTRL | InputEvent.ALT_MASK);
   }
+
+  /**
+   * Creates a KeyCode for the alt + the key passed in.
+   *
+   * @param keyCode
+   *          should be a KeyEvent.VK_* constant (it can also be a char
+   *          constant, but this does not work for all characters, so is not
+   *          recommended).
+   * @return
+   */
+  public static KeyStroke alt(int keyCode) {
+    return KeyStroke.getKeyStroke(keyCode, InputEvent.ALT_MASK);
+  }
 }

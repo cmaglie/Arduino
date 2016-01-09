@@ -32,6 +32,7 @@ package processing.app;
 
 import java.io.IOException;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.undo.UndoManager;
 
@@ -54,17 +55,19 @@ public abstract class EditorTabI extends JPanel {
     return this.file;
   }
 
+  /**
+   * Adds the "Edit" menu entries for the current editor tab.
+   * 
+   * @param menu
+   *          The JMenu object where the commands are added
+   */
+  abstract public JMenuItem[] getEditMenuEntries();
+  
   abstract public void updateKeywords(PdeKeywords keywords);
   
   abstract public void applyPreferences();
   
   abstract public SketchTextArea getTextArea();
-
-  abstract void handleSelectAll();
-  abstract void handleCut();
-  abstract void handlePaste();
-  abstract void handleHTMLCopy();
-  abstract void handleDiscourseCopy();
 
   abstract void handleIndentOutdent(boolean indent);
   abstract void handleCommentUncomment();

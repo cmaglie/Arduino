@@ -26,7 +26,6 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.MonitorFactory;
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.uploaders.SerialUploader;
-import cc.arduino.view.GoToLineNumber;
 import cc.arduino.view.StubMenuListener;
 import cc.arduino.view.findreplace.FindReplace;
 import com.jcraft.jsch.JSchException;
@@ -78,10 +77,12 @@ public class Editor extends JFrame implements RunnerListener {
   public static final int MAX_TIME_AWAITING_FOR_RESUMING_SERIAL_MONITOR = 10000;
 
   final Platform platform;
+  private JMenu editMenu;
   private JMenu recentSketchesMenu;
   private JMenu programmersMenu;
   private final Box upper;
   private ArrayList<EditorTabI> tabs = new ArrayList<>();
+  private int editMenuAttachIndex;
   private int currentTabIndex = -1;
 
   private static class ShouldSaveIfModified
@@ -1290,14 +1291,14 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   private JMenu buildEditMenu() {
-    JMenu menu = new JMenu(tr("Edit"));
-    menu.setName("menuEdit");
-    menu.setMnemonic(KeyEvent.VK_E);
+    editMenu = new JMenu(tr("Edit"));
+    editMenu.setName("menuEdit");
+    editMenu.setMnemonic(KeyEvent.VK_E);
 
     undoItem = newJMenuItem(tr("Undo"), 'Z');
     undoItem.setName("menuEditUndo");
     undoItem.addActionListener(undoAction = new UndoAction());
-    menu.add(undoItem);
+    editMenu.add(undoItem);
 
     if (!OSUtils.isMacOS()) {
         redoItem = newJMenuItem(tr("Redo"), 'Y');
@@ -1306,69 +1307,13 @@ public class Editor extends JFrame implements RunnerListener {
     }
     redoItem.setName("menuEditRedo");
     redoItem.addActionListener(redoAction = new RedoAction());
-    menu.add(redoItem);
+    editMenu.add(redoItem);
 
-    menu.addSeparator();
+    editMenu.addSeparator();
 
-    // TODO "cut" and "copy" should really only be enabled
-    // if some text is currently selected
-    JMenuItem cutItem = newJMenuItem(tr("Cut"), 'X');
-    cutItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handleCut();
-        }
-      });
-    menu.add(cutItem);
-
-    JMenuItem copyItem = newJMenuItem(tr("Copy"), 'C');
-    copyItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().getTextArea().copy();
-        }
-      });
-    menu.add(copyItem);
-
-    JMenuItem copyForumItem = newJMenuItemShift(tr("Copy for Forum"), 'C');
-    copyForumItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handleHTMLCopy();
-        }
-      });
-    menu.add(copyForumItem);
-
-    JMenuItem copyHTMLItem = newJMenuItemAlt(tr("Copy as HTML"), 'C');
-    copyHTMLItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handleDiscourseCopy();
-        }
-      });
-    menu.add(copyHTMLItem);
-
-    JMenuItem pasteItem = newJMenuItem(tr("Paste"), 'V');
-    pasteItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handlePaste();
-        }
-      });
-    menu.add(pasteItem);
-
-    JMenuItem selectAllItem = newJMenuItem(tr("Select All"), 'A');
-    selectAllItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handleSelectAll();
-        }
-      });
-    menu.add(selectAllItem);
-
-    JMenuItem gotoLine = newJMenuItem(tr("Go to line..."), 'L');
-    gotoLine.addActionListener(e -> {
-      GoToLineNumber goToLineNumber = new GoToLineNumber(Editor.this);
-      goToLineNumber.setLocationRelativeTo(Editor.this);
-      goToLineNumber.setVisible(true);
-    });
-    menu.add(gotoLine);
-
-    menu.addSeparator();
+    editMenuAttachIndex = editMenu.getItemCount();
+    
+    editMenu.addSeparator();
 
     JMenuItem commentItem = newJMenuItem(tr("Comment/Uncomment"), '/');
     commentItem.addActionListener(new ActionListener() {
@@ -1376,7 +1321,7 @@ public class Editor extends JFrame implements RunnerListener {
           getCurrentTab().handleCommentUncomment();
         }
     });
-    menu.add(commentItem);
+    editMenu.add(commentItem);
 
     JMenuItem increaseIndentItem = new JMenuItem(tr("Increase Indent"));
     increaseIndentItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
@@ -1385,7 +1330,7 @@ public class Editor extends JFrame implements RunnerListener {
           getCurrentTab().handleIndentOutdent(true);
         }
     });
-    menu.add(increaseIndentItem);
+    editMenu.add(increaseIndentItem);
 
     JMenuItem decreseIndentItem = new JMenuItem(tr("Decrease Indent"));
     decreseIndentItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
@@ -1395,9 +1340,9 @@ public class Editor extends JFrame implements RunnerListener {
           getCurrentTab().handleIndentOutdent(false);
         }
     });
-    menu.add(decreseIndentItem);
+    editMenu.add(decreseIndentItem);
 
-    menu.addSeparator();
+    editMenu.addSeparator();
 
     JMenuItem findItem = newJMenuItem(tr("Find..."), 'F');
     findItem.addActionListener(new ActionListener() {
@@ -1412,7 +1357,7 @@ public class Editor extends JFrame implements RunnerListener {
         find.setVisible(true);
       }
     });
-    menu.add(findItem);
+    editMenu.add(findItem);
 
     JMenuItem findNextItem = newJMenuItem(tr("Find Next"), 'G');
     findNextItem.addActionListener(new ActionListener() {
@@ -1422,7 +1367,7 @@ public class Editor extends JFrame implements RunnerListener {
         }
       }
     });
-    menu.add(findNextItem);
+    editMenu.add(findNextItem);
 
     JMenuItem findPreviousItem = newJMenuItemShift(tr("Find Previous"), 'G');
     findPreviousItem.addActionListener(new ActionListener() {
@@ -1432,7 +1377,7 @@ public class Editor extends JFrame implements RunnerListener {
         }
       }
     });
-    menu.add(findPreviousItem);
+    editMenu.add(findPreviousItem);
 
     if (OSUtils.isMacOS()) {
       JMenuItem useSelectionForFindItem = newJMenuItem(tr("Use Selection For Find"), 'E');
@@ -1444,10 +1389,10 @@ public class Editor extends JFrame implements RunnerListener {
           find.setFindText(getCurrentTab().getSelectedText());
         }
       });
-      menu.add(useSelectionForFindItem);
+      editMenu.add(useSelectionForFindItem);
     }
 
-    return menu;
+    return editMenu;
   }
 
 
@@ -1611,6 +1556,15 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+  
+  public void unselectTab() {
+    if (currentTabIndex == -1)
+      return;
+    for (JMenuItem i : getCurrentTab().getEditMenuEntries())
+      editMenu.remove(i);
+    currentTabIndex = -1;
+  }
+  
   /**
    * Change the currently displayed tab.
    * Note that the GUI might not update immediately, since this needs
@@ -1618,6 +1572,7 @@ public class Editor extends JFrame implements RunnerListener {
    * @param index The index of the tab to select
    */
   public void selectTab(final int index) {
+    unselectTab();
     currentTabIndex = index;
     undoAction.updateUndoState();
     redoAction.updateRedoState();
@@ -1627,6 +1582,10 @@ public class Editor extends JFrame implements RunnerListener {
 
     // This must be run in the GUI thread
     SwingUtilities.invokeLater(() -> {
+      int idx = editMenuAttachIndex;
+      for (JMenuItem item : getCurrentTab().getEditMenuEntries()) {
+        editMenu.insert(item, idx++);
+      }
       codePanel.removeAll();
       codePanel.add(tabs.get(index), BorderLayout.CENTER);
       tabs.get(index).requestFocusInWindow(); // get the caret blinking
@@ -1686,8 +1645,8 @@ public class Editor extends JFrame implements RunnerListener {
    * tabs.
    */
   public void createTabs() {
+    unselectTab();
     tabs.clear();
-    currentTabIndex = -1;
     tabs.ensureCapacity(sketch.getCodeCount());
     for (SketchFile file : sketch.getFiles()) {
       try {
