@@ -35,6 +35,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.CaretEvent;
@@ -53,11 +54,11 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
 import org.fife.ui.rtextarea.Gutter;
 import org.fife.ui.rtextarea.RTextScrollPane;
-import org.fife.ui.rtextarea.RUndoManager;
 
 import cc.arduino.view.GoToLineNumber;
 import processing.app.helpers.DocumentTextChangeListener;
 import processing.app.helpers.Keys;
+import processing.app.helpers.OSUtils;
 import processing.app.syntax.ArduinoTokenMakerFactory;
 import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.SketchTextArea;
@@ -101,11 +102,6 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     file.setStorage(this);
     applyPreferences();
     add(this.scrollPane, BorderLayout.CENTER);
-
-    RUndoManager undo = new LastUndoableEditAwareUndoManager(this.textarea,
-        this.editor);
-    document.addUndoableEditListener(undo);
-    textarea.setUndoManager(undo);
   }
 
   private RSyntaxDocument createDocument(String contents) {
@@ -177,13 +173,41 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     configurePopupMenu(textArea);
     return textArea;
   }
-  
+
   private JMenuItem editMenuEntries[] = null;
+  private JMenuItem undoMenuItem;
+  private JMenuItem redoMenuItem;
 
   @Override
   public JMenuItem[] getEditMenuEntries() {
     if (editMenuEntries != null)
       return editMenuEntries;
+    undoMenuItem = new JMenuItem(tr("Undo"));
+    undoMenuItem.setAccelerator(Keys.ctrl(KeyEvent.VK_Z));
+    undoMenuItem.setName("menuEditUndo");
+    undoMenuItem.addActionListener(e -> {
+      textarea.undoLastAction();
+      updateUndoRedoMenuItems();
+    });
+
+    redoMenuItem = new JMenuItem(tr("Redo"));
+    if (!OSUtils.isMacOS()) {
+      redoMenuItem.setAccelerator(Keys.ctrl(KeyEvent.VK_Y));
+    } else {
+      redoMenuItem.setAccelerator(Keys.ctrlShift(KeyEvent.VK_Z));
+    }
+    redoMenuItem.setName("menuEditRedo");
+    redoMenuItem.addActionListener(e -> {
+      textarea.redoLastAction();
+      updateUndoRedoMenuItems();
+    });
+
+    textarea.getDocument().addDocumentListener(new DocumentTextChangeListener(
+        () -> updateUndoRedoMenuItems()));
+
+    updateUndoRedoMenuItems();
+
+    // editMenu.addSeparator();
 
     // TODO "cut" and "copy" should really only be enabled
     // if some text is currently selected
@@ -220,8 +244,21 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     });
 
     editMenuEntries = new JMenuItem[] { //
-        cut, copy, copyForForum, copyAsHTML, paste, selectAll, gotoLine };
+        undoMenuItem, redoMenuItem, cut, copy, copyForForum, copyAsHTML, paste, selectAll,
+        gotoLine };
     return editMenuEntries;
+  }
+
+  private void updateUndoRedoMenuItems() {
+    SwingUtilities.invokeLater(() -> {
+      UndoManager um = getUndoManager();
+
+      undoMenuItem.setText(um.getUndoPresentationName());
+      undoMenuItem.setEnabled(um.canUndo());
+
+      redoMenuItem.setText(um.getRedoPresentationName());
+      redoMenuItem.setEnabled(um.canRedo());
+    });
   }
 
   private void configurePopupMenu(final SketchTextArea textarea){
@@ -557,7 +594,6 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
   void handleCommentUncomment() {
     Action action = textarea.getActionMap().get(RSyntaxTextAreaEditorKit.rstaToggleCommentAction);
     action.actionPerformed(null);
-
   }
 
   void handleDiscourseCopy() {
@@ -579,14 +615,6 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     }
   }
 
-  void handleUndo() {
-    textarea.undoLastAction();
-  }
-  
-  void handleRedo() {
-    textarea.redoLastAction();
-  }
-  
   public UndoManager getUndoManager() {
     return textarea.getUndoManager();
   }
@@ -637,5 +665,4 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     /** If focus is requested, focus the textarea instead. */
     return textarea.requestFocusInWindow();
   }
-
 }

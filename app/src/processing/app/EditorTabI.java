@@ -34,7 +34,6 @@ import java.io.IOException;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.undo.UndoManager;
 
 import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.SketchTextArea;
@@ -72,10 +71,6 @@ public abstract class EditorTabI extends JPanel {
   abstract void handleIndentOutdent(boolean indent);
   abstract void handleCommentUncomment();
 
-  abstract public UndoManager getUndoManager();
-  abstract void handleRedo();
-  abstract void handleUndo();
-  
   abstract public void activated();
   abstract public void reload();
   

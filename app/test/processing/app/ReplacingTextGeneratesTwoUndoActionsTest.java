@@ -39,29 +39,47 @@ public class ReplacingTextGeneratesTwoUndoActionsTest extends AbstractGUITest {
 
   @Test
   public void shouldUndoAndRedo() throws Exception {
-    JMenuItemFixture menuEditUndo = window.menuItem("menuEditUndo");
-    menuEditUndo.requireDisabled();
-    JMenuItemFixture menuEditRedo = window.menuItem("menuEditRedo");
-    menuEditRedo.requireDisabled();
-
+    JMenuItemFixture undo = window.menuItem("menuEditUndo");
+    JMenuItemFixture redo = window.menuItem("menuEditRedo");
     SketchTextAreaFixture textArea = window.textArea("editor");
 
+    String initalText = textArea.getText();
+
+    // At the beginning undo and redo are disabled
+    undo.requireDisabled();
+    redo.requireDisabled();
+
+    // Replace text, this generates *two* actions:
+    // - Remove initialText (textarea is empty)
+    // - Add new "fake text"
     textArea.setText("fake text");
 
-    menuEditUndo.requireEnabled();
-    menuEditUndo.click();
+    // Now shoud be enabled only undo
+    undo.requireEnabled();
+    redo.requireDisabled();
 
+    // Undo once (-> empty textarea, undo and redo enabled)
+    undo.click();
     assertEquals("", textArea.getText());
+    undo.requireEnabled();
+    redo.requireEnabled();
 
-    menuEditRedo.requireEnabled();
-    menuEditRedo.click();
+    // Redo once (-> fake text, only redo enabled)
+    redo.click();
+    assertEquals("fake text", textArea.getText());
+    undo.requireEnabled();
+    redo.requireDisabled();
 
-    //assertEquals("fake text", RSyntaxTextArea.getText());
+    // Undo once (-> empty textarea, undo and redo enabled)
+    undo.click();
+    assertEquals("", textArea.getText());
+    undo.requireEnabled();
+    redo.requireEnabled();
 
-    menuEditUndo.requireEnabled();
-    menuEditUndo.click();
-    menuEditUndo.click();
-    menuEditUndo.requireDisabled();
-    menuEditRedo.requireEnabled();
+    // Undo once (-> initalText, only redo enabled)
+    undo.click();
+    assertEquals(initalText, textArea.getText());
+    undo.requireDisabled();
+    redo.requireEnabled();
   }
 }

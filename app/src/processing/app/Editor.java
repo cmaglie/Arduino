@@ -43,9 +43,6 @@ import processing.app.tools.Tool;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.BadLocationException;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -179,12 +176,6 @@ public class Editor extends JFrame implements RunnerListener {
 
   //boolean presenting;
   private boolean uploading;
-
-  // undo fellers
-  private JMenuItem undoItem;
-  private JMenuItem redoItem;
-  protected UndoAction undoAction;
-  protected RedoAction redoAction;
 
   private FindReplace find;
 
@@ -1295,22 +1286,6 @@ public class Editor extends JFrame implements RunnerListener {
     editMenu.setName("menuEdit");
     editMenu.setMnemonic(KeyEvent.VK_E);
 
-    undoItem = newJMenuItem(tr("Undo"), 'Z');
-    undoItem.setName("menuEditUndo");
-    undoItem.addActionListener(undoAction = new UndoAction());
-    editMenu.add(undoItem);
-
-    if (!OSUtils.isMacOS()) {
-        redoItem = newJMenuItem(tr("Redo"), 'Y');
-    } else {
-        redoItem = newJMenuItemShift(tr("Redo"), 'Z');
-    }
-    redoItem.setName("menuEditRedo");
-    redoItem.addActionListener(redoAction = new RedoAction());
-    editMenu.add(redoItem);
-
-    editMenu.addSeparator();
-
     editMenuAttachIndex = editMenu.getItemCount();
     
     editMenu.addSeparator();
@@ -1433,74 +1408,6 @@ public class Editor extends JFrame implements RunnerListener {
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-  class UndoAction extends AbstractAction {
-    public UndoAction() {
-      super("Undo");
-      this.setEnabled(false);
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      try {
-        getCurrentTab().handleUndo();
-      } catch (CannotUndoException ex) {
-        //System.out.println("Unable to undo: " + ex);
-        //ex.printStackTrace();
-      }
-    }
-
-    protected void updateUndoState() {
-      UndoManager undo = getCurrentTab().getUndoManager();
-
-      if (undo.canUndo()) {
-        this.setEnabled(true);
-        undoItem.setEnabled(true);
-        undoItem.setText(undo.getUndoPresentationName());
-        putValue(Action.NAME, undo.getUndoPresentationName());
-      } else {
-        this.setEnabled(false);
-        undoItem.setEnabled(false);
-        undoItem.setText(tr("Undo"));
-        putValue(Action.NAME, "Undo");
-      }
-    }
-  }
-
-
-  class RedoAction extends AbstractAction {
-    public RedoAction() {
-      super("Redo");
-      this.setEnabled(false);
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      try {
-        getCurrentTab().handleRedo();
-      } catch (CannotRedoException ex) {
-        //System.out.println("Unable to redo: " + ex);
-        //ex.printStackTrace();
-      }
-    }
-
-    protected void updateRedoState() {
-      UndoManager undo = getCurrentTab().getUndoManager();
-
-      if (undo.canRedo()) {
-        redoItem.setEnabled(true);
-        redoItem.setText(undo.getRedoPresentationName());
-        putValue(Action.NAME, undo.getRedoPresentationName());
-      } else {
-        this.setEnabled(false);
-        redoItem.setEnabled(false);
-        redoItem.setText(tr("Redo"));
-        putValue(Action.NAME, "Redo");
-      }
-    }
-  }
-
-
-  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
   // these will be done in a more generic way soon, more like:
   // setHandler("action name", Runnable);
   // but for the time being, working out the kinks of how many things to
@@ -1574,8 +1481,6 @@ public class Editor extends JFrame implements RunnerListener {
   public void selectTab(final int index) {
     unselectTab();
     currentTabIndex = index;
-    undoAction.updateUndoState();
-    redoAction.updateRedoState();
     updateTitle();
     header.rebuild();
     getCurrentTab().activated();
