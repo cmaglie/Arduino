@@ -27,7 +27,6 @@ import static processing.app.I18n.tr;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -180,6 +179,11 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
   private JMenuItem undoMenuItem;
   private JMenuItem redoMenuItem;
 
+  private ActionListener handleHTMLCopy = e -> new DiscourseFormat(editor, this,
+      true).show();
+  private ActionListener handleDiscourseCopy = e -> new DiscourseFormat(editor,
+      this, false).show();
+
   @Override
   public Component[] getEditMenuEntries() {
     if (editMenuEntries != null)
@@ -213,7 +217,7 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     // if some text is currently selected
     JMenuItem cut = new JMenuItem(tr("Cut"));
     cut.setAccelerator(Keys.ctrl(KeyEvent.VK_X));
-    cut.addActionListener(e -> handleCut());
+    cut.addActionListener(e -> getTextArea().cut());
 
     JMenuItem copy = new JMenuItem(tr("Copy"));
     copy.setAccelerator(Keys.ctrl(KeyEvent.VK_C));
@@ -221,21 +225,21 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
 
     JMenuItem copyForForum = new JMenuItem(tr("Copy for Forum"));
     copyForForum.setAccelerator(Keys.ctrlShift(KeyEvent.VK_C));
-    copyForForum.addActionListener(e -> handleHTMLCopy());
+    copyForForum.addActionListener(handleDiscourseCopy);
 
     JMenuItem copyAsHTML = new JMenuItem(tr("Copy as HTML"));
     copyAsHTML.setAccelerator(Keys.alt(KeyEvent.VK_C));
-    copyAsHTML.addActionListener(e -> handleDiscourseCopy());
+    copyAsHTML.addActionListener(handleHTMLCopy);
 
     JMenuItem paste = new JMenuItem(tr("Paste"));
     paste.setAccelerator(Keys.ctrl(KeyEvent.VK_V));
-    paste.addActionListener(e -> handlePaste());
+    paste.addActionListener(e -> getTextArea().paste());
 
     JMenuItem selectAll = new JMenuItem(tr("Select All"));
     selectAll.setAccelerator(Keys.ctrl(KeyEvent.VK_A));
-    selectAll.addActionListener(e -> handleSelectAll());
+    selectAll.addActionListener(e -> getTextArea().selectAll());
 
-    JMenuItem gotoLine = new JMenuItem(tr("Go to line..."), 'L');
+    JMenuItem gotoLine = new JMenuItem(tr("Go to line..."));
     gotoLine.setAccelerator(Keys.ctrl(KeyEvent.VK_L));
     gotoLine.addActionListener(e -> {
       GoToLineNumber goToLineNumber = new GoToLineNumber(editor);
@@ -303,19 +307,11 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     menu.add(item);
 
     item = new JMenuItem(tr("Copy for Forum"));
-    item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        handleDiscourseCopy();
-      }
-    });
+    item.addActionListener(handleDiscourseCopy);
     menu.add(item);
 
     item = new JMenuItem(tr("Copy as HTML"));
-    item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        handleHTMLCopy();
-      }
-    });
+    item.addActionListener(handleHTMLCopy);
     menu.add(item);
 
     final JMenuItem referenceItem = new JMenuItem(tr("Find in Reference"));
@@ -323,11 +319,7 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     menu.add(referenceItem);  
 
     final JMenuItem openURLItem = new JMenuItem(tr("Open URL"));
-    openURLItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        Base.openURL(e.getActionCommand());
-      }
-    });
+    openURLItem.addActionListener(e -> Base.openURL(e.getActionCommand()));
     menu.add(openURLItem);   
     
     menu.addPopupMenuListener(new PopupMenuListener() {
@@ -577,34 +569,9 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     }
   }
   
-  void handleCut() {
-    textarea.cut();
-  }
- 
-  void handleCopy() {
-    textarea.copy();
-  }
-  
-  void handlePaste() {
-    textarea.paste();
-  }
-  
-  void handleSelectAll() {
-    textarea.selectAll();
-  }
-
   void handleCommentUncomment() {
     Action action = textarea.getActionMap().get(RSyntaxTextAreaEditorKit.rstaToggleCommentAction);
     action.actionPerformed(null);
-  }
-
-  void handleDiscourseCopy() {
-    new DiscourseFormat(editor, this, false).show();
-  }
-
-
-  void handleHTMLCopy() {
-    new DiscourseFormat(editor, this, true).show();
   }
 
   void handleIndentOutdent(boolean indent) {

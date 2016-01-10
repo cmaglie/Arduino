@@ -49,16 +49,17 @@ public abstract class EditorTabI extends JPanel {
   
   /**
    * Get the SketchFile that is being edited/viewed in this tab.
+   * 
+   * @return
    */
   public SketchFile getSketchFile() {
     return this.file;
   }
 
   /**
-   * Adds the "Edit" menu entries for the current editor tab.
+   * Get the "Edit" menu entries for the current editor tab.
    * 
-   * @param menu
-   *          The JMenu object where the commands are added
+   * @return
    */
   abstract public Component[] getEditMenuEntries();
   
