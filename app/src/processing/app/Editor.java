@@ -1467,7 +1467,7 @@ public class Editor extends JFrame implements RunnerListener {
   public void unselectTab() {
     if (currentTabIndex == -1)
       return;
-    for (JMenuItem i : getCurrentTab().getEditMenuEntries())
+    for (Component i : getCurrentTab().getEditMenuEntries())
       editMenu.remove(i);
     currentTabIndex = -1;
   }
@@ -1488,8 +1488,8 @@ public class Editor extends JFrame implements RunnerListener {
     // This must be run in the GUI thread
     SwingUtilities.invokeLater(() -> {
       int idx = editMenuAttachIndex;
-      for (JMenuItem item : getCurrentTab().getEditMenuEntries()) {
-        editMenu.insert(item, idx++);
+      for (Component item : getCurrentTab().getEditMenuEntries()) {
+        editMenu.add(item, idx++);
       }
       codePanel.removeAll();
       codePanel.add(tabs.get(index), BorderLayout.CENTER);

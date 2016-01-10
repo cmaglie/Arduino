@@ -26,6 +26,7 @@ package processing.app;
 import static processing.app.I18n.tr;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -35,6 +36,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.MatteBorder;
@@ -45,9 +47,9 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.PlainDocument;
 import javax.swing.undo.UndoManager;
-import javax.swing.text.DefaultCaret;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
@@ -174,12 +176,12 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     return textArea;
   }
 
-  private JMenuItem editMenuEntries[] = null;
+  private Component editMenuEntries[] = null;
   private JMenuItem undoMenuItem;
   private JMenuItem redoMenuItem;
 
   @Override
-  public JMenuItem[] getEditMenuEntries() {
+  public Component[] getEditMenuEntries() {
     if (editMenuEntries != null)
       return editMenuEntries;
     undoMenuItem = new JMenuItem(tr("Undo"));
@@ -206,8 +208,6 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
         () -> updateUndoRedoMenuItems()));
 
     updateUndoRedoMenuItems();
-
-    // editMenu.addSeparator();
 
     // TODO "cut" and "copy" should really only be enabled
     // if some text is currently selected
@@ -243,9 +243,11 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
       goToLineNumber.setVisible(true);
     });
 
-    editMenuEntries = new JMenuItem[] { //
-        undoMenuItem, redoMenuItem, cut, copy, copyForForum, copyAsHTML, paste, selectAll,
-        gotoLine };
+    editMenuEntries = new Component[] { //
+        undoMenuItem, redoMenuItem, //
+        new JSeparator(),
+        cut, copy, copyForForum, copyAsHTML, paste, selectAll, gotoLine, //
+    };
     return editMenuEntries;
   }
 

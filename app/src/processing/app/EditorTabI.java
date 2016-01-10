@@ -30,9 +30,9 @@
 
 package processing.app;
 
+import java.awt.Component;
 import java.io.IOException;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import processing.app.syntax.PdeKeywords;
@@ -60,7 +60,7 @@ public abstract class EditorTabI extends JPanel {
    * @param menu
    *          The JMenu object where the commands are added
    */
-  abstract public JMenuItem[] getEditMenuEntries();
+  abstract public Component[] getEditMenuEntries();
   
   abstract public void updateKeywords(PdeKeywords keywords);
   
