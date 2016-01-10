@@ -1290,35 +1290,6 @@ public class Editor extends JFrame implements RunnerListener {
     
     editMenu.addSeparator();
 
-    JMenuItem commentItem = newJMenuItem(tr("Comment/Uncomment"), '/');
-    commentItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handleCommentUncomment();
-        }
-    });
-    editMenu.add(commentItem);
-
-    JMenuItem increaseIndentItem = new JMenuItem(tr("Increase Indent"));
-    increaseIndentItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
-    increaseIndentItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handleIndentOutdent(true);
-        }
-    });
-    editMenu.add(increaseIndentItem);
-
-    JMenuItem decreseIndentItem = new JMenuItem(tr("Decrease Indent"));
-    decreseIndentItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
-    decreseIndentItem.setName("menuDecreaseIndent");
-    decreseIndentItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          getCurrentTab().handleIndentOutdent(false);
-        }
-    });
-    editMenu.add(decreseIndentItem);
-
-    editMenu.addSeparator();
-
     JMenuItem findItem = newJMenuItem(tr("Find..."), 'F');
     findItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

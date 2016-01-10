@@ -69,9 +69,6 @@ public abstract class EditorTabI extends JPanel {
   
   abstract public SketchTextArea getTextArea();
 
-  abstract void handleIndentOutdent(boolean indent);
-  abstract void handleCommentUncomment();
-
   abstract public void activated();
   abstract public void reload();
   

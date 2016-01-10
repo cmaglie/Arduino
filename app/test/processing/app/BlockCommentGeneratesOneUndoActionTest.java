@@ -31,10 +31,6 @@ package processing.app;
 
 import static org.junit.Assert.assertEquals;
 
-import java.awt.Frame;
-
-import org.fest.swing.edt.GuiActionRunner;
-import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
 
@@ -45,6 +41,8 @@ public class BlockCommentGeneratesOneUndoActionTest extends AbstractGUITest {
   @Test
   public void shouldUndoAndRedo() throws Exception {
     JMenuItemFixture menuEditUndo = window.menuItem("menuEditUndo");
+    JMenuItemFixture menuCommentUncomment = window
+        .menuItem("menuCommentUncomment");
     menuEditUndo.requireDisabled();
 
     SketchTextAreaFixture jEditTextArea = window.textArea("editor");
@@ -52,14 +50,7 @@ public class BlockCommentGeneratesOneUndoActionTest extends AbstractGUITest {
 
     jEditTextArea.selectAll();
 
-    GuiActionRunner.execute(new GuiQuery<Frame>() {
-
-      protected Frame executeInEDT() {
-        window.getEditor().getCurrentTab().handleCommentUncomment();
-        return window.getEditor();
-      }
-
-    });
+    menuCommentUncomment.click();
 
     menuEditUndo.requireEnabled();
     menuEditUndo.click();

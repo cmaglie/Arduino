@@ -31,11 +31,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
-import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.MatteBorder;
@@ -183,6 +184,14 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
       true).show();
   private ActionListener handleDiscourseCopy = e -> new DiscourseFormat(editor,
       this, false).show();
+  private ActionListener handleCommentUncomment = e -> runRSTAAction(RSyntaxTextAreaEditorKit.rstaToggleCommentAction);
+  private ActionListener handleIndent = e -> runRSTAAction(SketchTextAreaEditorKit.rtaIncreaseIndentAction);
+  private ActionListener handleOutdent = e -> runRSTAAction(RSyntaxTextAreaEditorKit.rstaDecreaseIndentAction);
+
+  private void runRSTAAction(Object action) {
+    ActionMap actions = getTextArea().getActionMap();
+    actions.get(action).actionPerformed(null);
+  }
 
   @Override
   public Component[] getEditMenuEntries() {
@@ -247,10 +256,26 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
       goToLineNumber.setVisible(true);
     });
 
+    JMenuItem comment = new JMenuItem(tr("Comment/Uncomment"));
+    comment.setName("menuCommentUncomment");
+    comment.setAccelerator(Keys.ctrl(KeyEvent.VK_SLASH));
+    comment.addActionListener(handleCommentUncomment);
+
+    JMenuItem increaseIndent = new JMenuItem(tr("Increase Indent"));
+    increaseIndent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
+    increaseIndent.addActionListener(handleIndent);
+
+    JMenuItem decreseIndentItem = new JMenuItem(tr("Decrease Indent"));
+    decreseIndentItem.setAccelerator(Keys.shift(KeyEvent.VK_TAB));
+    decreseIndentItem.setName("menuDecreaseIndent");
+    decreseIndentItem.addActionListener(handleOutdent);
+
     editMenuEntries = new Component[] { //
         undoMenuItem, redoMenuItem, //
-        new JSeparator(),
+        new JSeparator(), //
         cut, copy, copyForForum, copyAsHTML, paste, selectAll, gotoLine, //
+        new JSeparator(), //
+        comment, increaseIndent, decreseIndentItem, //
     };
     return editMenuEntries;
   }
@@ -282,28 +307,16 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     menu.add(item);
     
     item = new JMenuItem(tr("Comment/Uncomment"), '/');
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleCommentUncomment();
-        }
-    });
+    item.addActionListener(handleCommentUncomment);
     menu.add(item);
 
     item = new JMenuItem(tr("Increase Indent"), ']');
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleIndentOutdent(true);
-        }
-    });
+    item.addActionListener(handleIndent);
     menu.add(item);
 
     item = new JMenuItem(tr("Decrease Indent"), '[');
     item.setName("menuDecreaseIndent");
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleIndentOutdent(false);
-        }
-    });
+    item.addActionListener(handleOutdent);
     menu.add(item);
 
     item = new JMenuItem(tr("Copy for Forum"));
@@ -569,21 +582,6 @@ public class EditorTab extends EditorTabI implements SketchFile.TextStorage {
     }
   }
   
-  void handleCommentUncomment() {
-    Action action = textarea.getActionMap().get(RSyntaxTextAreaEditorKit.rstaToggleCommentAction);
-    action.actionPerformed(null);
-  }
-
-  void handleIndentOutdent(boolean indent) {
-    if (indent) {
-      Action action = textarea.getActionMap().get(SketchTextAreaEditorKit.rtaIncreaseIndentAction);
-      action.actionPerformed(null);
-    } else {
-      Action action = textarea.getActionMap().get(RSyntaxTextAreaEditorKit.rstaDecreaseIndentAction);
-      action.actionPerformed(null);
-    }
-  }
-
   public UndoManager getUndoManager() {
     return textarea.getUndoManager();
   }
