@@ -53,7 +53,7 @@ public abstract class EditorTabI extends JPanel {
    * @return
    */
   public SketchFile getSketchFile() {
-    return this.file;
+    return file;
   }
 
   /**

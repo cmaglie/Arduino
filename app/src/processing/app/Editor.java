@@ -1543,7 +1543,12 @@ public class Editor extends JFrame implements RunnerListener {
    * @throws IOException
    */
   protected void addTab(SketchFile file) throws IOException {
-    EditorTabI tab = new EditorTab(this, file);
+    EditorTabI tab;
+    if (file.isExtension("png")) {
+      tab = new ImageViewerEditorTab(this, file);
+    } else {
+      tab = new EditorTab(this, file);
+    }
     tabs.add(tab);
   }
 
