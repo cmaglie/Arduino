@@ -115,6 +115,17 @@ public class Theme {
     set(key, String.valueOf(value));
   }
 
+  static private int DEFAULT_SCALE = 0;
+
+  static public int getDefaultScale() {
+    if (DEFAULT_SCALE == 0) {
+      int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+      // 96 DPI is the standard "100%" density
+      DEFAULT_SCALE = dpi * 100 / 96;
+    }
+    return DEFAULT_SCALE;
+  }
+
   static public int getScale() {
     try {
       int scale = PreferencesData.getInteger("gui.scale", -1);
@@ -122,7 +133,7 @@ public class Theme {
         return scale;
     } catch (NumberFormatException ignore) {
     }
-    return 100;
+    return getDefaultScale();
   }
 
   static public int scale(int size) {
