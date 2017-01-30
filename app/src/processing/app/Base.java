@@ -51,7 +51,6 @@ import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.legacy.PApplet;
 import processing.app.macosx.ThinkDifferent;
 import processing.app.packages.LibraryList;
-import processing.app.packages.UserLibrary;
 import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.SketchTextAreaDefaultInputMap;
 import processing.app.tools.MenuScroller;
@@ -1092,7 +1091,7 @@ public class Base {
 
         AbstractAction action = new AbstractAction(lib.getName()) {
           public void actionPerformed(ActionEvent event) {
-            UserLibrary l = (UserLibrary) getValue("library");
+            ContributedLibrary l = (ContributedLibrary) getValue("library");
             try {
               activeEditor.getSketchController().importLibrary(l);
             } catch (IOException e) {
@@ -1163,7 +1162,7 @@ public class Base {
     LibraryList sketchbookLibs = new LibraryList();
     LibraryList sketchbookIncompatibleLibs = new LibraryList();
     LibraryList otherLibs = new LibraryList();
-    for (UserLibrary lib : allLibraries) {
+    for (ContributedLibrary lib : allLibraries) {
       // Get the library's location - used for sorting into categories
       File libraryLocation = lib.getInstalledFolder().getParentFile();
       // Is this library compatible?
@@ -1221,7 +1220,7 @@ public class Base {
       label.setEnabled(false);
       menu.add(label);
     }
-    for (UserLibrary lib : ideLibs) {
+    for (ContributedLibrary lib : ideLibs) {
       addSketchesSubmenu(menu, lib);
     }
 
@@ -1229,7 +1228,7 @@ public class Base {
       retiredIdeLibs.sort();
       JMenu retired = new JMenu(tr("RETIRED"));
       menu.add(retired);
-      for (UserLibrary lib : retiredIdeLibs) {
+      for (ContributedLibrary lib : retiredIdeLibs) {
         addSketchesSubmenu(retired, lib);
       }
     }
@@ -1240,7 +1239,7 @@ public class Base {
       label = new JMenuItem(I18n.format(tr("Examples for {0}"), boardId));
       label.setEnabled(false);
       menu.add(label);
-      for (UserLibrary lib : platformLibs) {
+      for (ContributedLibrary lib : platformLibs) {
         addSketchesSubmenu(menu, lib);
       }
     }
@@ -1251,7 +1250,7 @@ public class Base {
       label = new JMenuItem(I18n.format(tr("Examples for {0}"), referencedPlatformName));
       label.setEnabled(false);
       menu.add(label);
-      for (UserLibrary lib : referencedPlatformLibs) {
+      for (ContributedLibrary lib : referencedPlatformLibs) {
         addSketchesSubmenu(menu, lib);
       }
     }
@@ -1262,7 +1261,7 @@ public class Base {
       label = new JMenuItem(tr("Examples from Custom Libraries"));
       label.setEnabled(false);
       menu.add(label);
-      for (UserLibrary lib : sketchbookLibs) {
+      for (ContributedLibrary lib : sketchbookLibs) {
         addSketchesSubmenu(menu, lib);
       }
     }
@@ -1271,7 +1270,7 @@ public class Base {
       sketchbookIncompatibleLibs.sort();
       JMenu incompatible = new JMenu(tr("INCOMPATIBLE"));
       menu.add(incompatible);
-      for (UserLibrary lib : sketchbookIncompatibleLibs) {
+      for (ContributedLibrary lib : sketchbookIncompatibleLibs) {
         addSketchesSubmenu(incompatible, lib);
       }
     }
@@ -1282,7 +1281,7 @@ public class Base {
       label = new JMenuItem(tr("Examples from Other Libraries"));
       label.setEnabled(false);
       menu.add(label);
-      for (UserLibrary lib : otherLibs) {
+      for (ContributedLibrary lib : otherLibs) {
         addSketchesSubmenu(menu, lib);
       }
     }
@@ -1685,7 +1684,7 @@ public class Base {
     return ifound;
   }
 
-  private boolean addSketchesSubmenu(JMenu menu, UserLibrary lib) {
+  private boolean addSketchesSubmenu(JMenu menu, ContributedLibrary lib) {
     return addSketchesSubmenu(menu, lib.getName(), lib.getInstalledFolder());
   }
 
@@ -1758,11 +1757,11 @@ public class Base {
     LibraryList list = new LibraryList(libs);
     list.sort();
 
-    for (UserLibrary lib : list) {
+    for (ContributedLibrary lib : list) {
       @SuppressWarnings("serial")
       AbstractAction action = new AbstractAction(lib.getName()) {
         public void actionPerformed(ActionEvent event) {
-          UserLibrary l = (UserLibrary) getValue("library");
+          ContributedLibrary l = (ContributedLibrary) getValue("library");
           try {
             activeEditor.getSketchController().importLibrary(l);
           } catch (IOException e) {
@@ -2275,7 +2274,7 @@ public class Base {
 
       String[] headers;
       if (new File(libFolder, "library.properties").exists()) {
-        headers = BaseNoGui.headerListFromIncludePath(UserLibrary.create(libFolder).getSrcFolder());
+        headers = BaseNoGui.headerListFromIncludePath(ContributedLibrary.create(libFolder).getSrcFolder());
       } else {
         headers = BaseNoGui.headerListFromIncludePath(libFolder);
       }

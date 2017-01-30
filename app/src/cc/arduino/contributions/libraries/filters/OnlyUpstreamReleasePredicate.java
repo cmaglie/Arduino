@@ -30,7 +30,6 @@
 package cc.arduino.contributions.libraries.filters;
 
 import cc.arduino.contributions.libraries.ContributedLibrary;
-import processing.app.packages.UserLibrary;
 
 import java.util.function.Predicate;
 
@@ -38,11 +37,7 @@ public class OnlyUpstreamReleasePredicate implements Predicate<ContributedLibrar
 
   @Override
   public boolean test(ContributedLibrary input) {
-    return !(input instanceof UserLibrary);
+    return input.getUrl() != null;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    return obj instanceof OnlyUpstreamReleasePredicate;
-  }
 }

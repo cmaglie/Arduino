@@ -42,7 +42,6 @@ import processing.app.I18n;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.packages.LibraryList;
-import processing.app.packages.UserLibrary;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -173,7 +172,7 @@ public class LibrariesIndexer {
     File check = new File(folder, "library.properties");
     if (!check.exists() || !check.isFile()) {
       // Create a legacy library and exit
-      UserLibrary lib = UserLibrary.createFromLegacyPre15ArduinoIDE(folder);
+      ContributedLibrary lib = ContributedLibrary.createFromLegacyPre15ArduinoIDE(folder);
       lib.setReadOnly(readOnly);
       String[] headers = BaseNoGui.headerListFromIncludePath(lib.getSrcFolder());
       if (headers.length == 0) {
@@ -189,7 +188,7 @@ public class LibrariesIndexer {
     }
 
     // Create a regular library
-    UserLibrary lib = UserLibrary.create(folder);
+    ContributedLibrary lib = ContributedLibrary.create(folder);
     lib.setReadOnly(readOnly);
     String[] headers = BaseNoGui.headerListFromIncludePath(lib.getSrcFolder());
     if (headers.length == 0) {

@@ -40,10 +40,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import cc.arduino.contributions.libraries.ContributedLibrary;
 import processing.app.helpers.FileUtils;
 
 @SuppressWarnings("serial")
-public class LibraryList extends LinkedList<UserLibrary> {
+public class LibraryList extends LinkedList<ContributedLibrary> {
 
   public LibraryList(LibraryList libs) {
     super(libs);
@@ -53,32 +54,32 @@ public class LibraryList extends LinkedList<UserLibrary> {
     super();
   }
 
-  public LibraryList(List<UserLibrary> ideLibs) {
+  public LibraryList(List<ContributedLibrary> ideLibs) {
     super(ideLibs);
   }
 
-  public synchronized UserLibrary getByName(String name) {
-    for (UserLibrary l : this)
+  public synchronized ContributedLibrary getByName(String name) {
+    for (ContributedLibrary l : this)
       if (l.getName().equals(name))
         return l;
     return null;
   }
 
-  public synchronized void addOrReplaceArchAware(UserLibrary lib) {
+  public synchronized void addOrReplaceArchAware(ContributedLibrary lib) {
     addOrReplace(lib, true);
   }
 
-  public synchronized void addOrReplace(UserLibrary lib) {
+  public synchronized void addOrReplace(ContributedLibrary lib) {
     addOrReplace(lib, false);
   }
 
-  public synchronized void addOrReplace(UserLibrary lib, boolean archAware) {
+  public synchronized void addOrReplace(ContributedLibrary lib, boolean archAware) {
     remove(lib, archAware);
     add(lib);
   }
 
-  public synchronized void remove(UserLibrary lib, boolean archAware) {
-    UserLibrary l = getByName(lib.getName());
+  public synchronized void remove(ContributedLibrary lib, boolean archAware) {
+    ContributedLibrary l = getByName(lib.getName());
     if (l != null) {
       if (!archAware || lib.getArchitectures().contains("*") || lib.getArchitectures().containsAll(l.getArchitectures()))
         super.remove(l);
@@ -86,12 +87,12 @@ public class LibraryList extends LinkedList<UserLibrary> {
   }
 
   public synchronized void sort() {
-    Collections.sort(this, UserLibrary.CASE_INSENSITIVE_ORDER);
+    Collections.sort(this, ContributedLibrary.CASE_INSENSITIVE_ORDER);
   }
 
   public synchronized LibraryList filterLibrariesInSubfolder(File subFolder) {
     LibraryList res = new LibraryList();
-    for (UserLibrary lib : this) {
+    for (ContributedLibrary lib : this) {
       if (FileUtils.isSubDirectory(subFolder, lib.getInstalledFolder())) {
         res.add(lib);
       }
@@ -99,21 +100,21 @@ public class LibraryList extends LinkedList<UserLibrary> {
     return res;
   }
 
-  public synchronized boolean hasLibrary(UserLibrary lib) {
-    for (UserLibrary l : this)
+  public synchronized boolean hasLibrary(ContributedLibrary lib) {
+    for (ContributedLibrary l : this)
       if (l == lib) return true;
     return false;
   }
 
-  public static Collector<UserLibrary, LibraryList, LibraryList> collector() {
-    return new Collector<UserLibrary, LibraryList, LibraryList>() {
+  public static Collector<ContributedLibrary, LibraryList, LibraryList> collector() {
+    return new Collector<ContributedLibrary, LibraryList, LibraryList>() {
       @Override
       public Supplier<LibraryList> supplier() {
         return () -> new LibraryList();
       }
 
       @Override
-      public BiConsumer<LibraryList, UserLibrary> accumulator() {
+      public BiConsumer<LibraryList, ContributedLibrary> accumulator() {
         return (libs, lib) -> libs.add(lib);
       }
 

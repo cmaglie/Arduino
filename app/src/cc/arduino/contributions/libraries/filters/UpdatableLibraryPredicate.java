@@ -32,7 +32,6 @@ package cc.arduino.contributions.libraries.filters;
 import cc.arduino.contributions.VersionComparator;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import processing.app.BaseNoGui;
-import processing.app.packages.UserLibrary;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -48,7 +47,7 @@ public class UpdatableLibraryPredicate implements Predicate<ContributedLibrary> 
   @Override
   public boolean test(ContributedLibrary contributedLibrary) {
     String libraryName = contributedLibrary.getName();
-    UserLibrary installed = BaseNoGui.librariesIndexer.getInstalledLibraries().getByName(libraryName);
+    ContributedLibrary installed = BaseNoGui.librariesIndexer.getInstalledLibraries().getByName(libraryName);
     if (installed == null) {
       return false;
     }

@@ -26,6 +26,7 @@ package processing.app;
 import cc.arduino.Compiler;
 import cc.arduino.CompilerProgressListener;
 import cc.arduino.UploaderUtils;
+import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.packages.Uploader;
 import processing.app.debug.RunnerException;
 import processing.app.forms.PasswordAuthorizationDialog;
@@ -33,7 +34,6 @@ import processing.app.helpers.FileUtils;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMapException;
 import processing.app.packages.LibraryList;
-import processing.app.packages.UserLibrary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -577,7 +577,7 @@ public class SketchController {
   /**
    * Add import statements to the current tab for the specified library
    */
-  public void importLibrary(UserLibrary lib) throws IOException {
+  public void importLibrary(ContributedLibrary lib) throws IOException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -771,8 +771,8 @@ public class SketchController {
   public boolean isReadOnly(LibraryList libraries, String examplesPath) {
     String apath = sketch.getFolder().getAbsolutePath();
 
-    Optional<UserLibrary> libraryThatIncludesSketch = libraries.stream().filter(lib -> apath.startsWith(lib.getInstalledFolder().getAbsolutePath())).findFirst();
-    if (libraryThatIncludesSketch.isPresent() && !libraryThatIncludesSketch.get().onGoingDevelopment()) {
+    Optional<ContributedLibrary> libraryThatIncludesSketch = libraries.stream().filter(lib -> apath.startsWith(lib.getInstalledFolder().getAbsolutePath())).findFirst();
+    if (libraryThatIncludesSketch.isPresent() && !libraryThatIncludesSketch.get().isOnGoingDevelopment()) {
       return true;
     }
 

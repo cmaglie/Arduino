@@ -4,6 +4,7 @@ import cc.arduino.Constants;
 import cc.arduino.contributions.GPGDetachedSignatureVerifier;
 import cc.arduino.contributions.SignatureVerificationFailedException;
 import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributedTool;
@@ -19,7 +20,6 @@ import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.legacy.PApplet;
 import processing.app.packages.LibraryList;
-import processing.app.packages.UserLibrary;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -713,7 +713,7 @@ public class BaseNoGui {
     // library on each list. The others are used only to advise
     // user of ambiguously matched and duplicate libraries.
     importToLibraryTable = new HashMap<>();
-    for (UserLibrary lib : librariesIndexer.getInstalledLibraries()) {
+    for (ContributedLibrary lib : librariesIndexer.getInstalledLibraries()) {
       try {
         String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
@@ -724,7 +724,7 @@ public class BaseNoGui {
             list.addFirst(lib);
             importToLibraryTable.put(header, list);
           } else {
-            UserLibrary old = list.peekFirst();
+            ContributedLibrary old = list.peekFirst();
             boolean useThisLib = true;
             // This is the case where 2 libraries have a .h header
             // with the same name.  We must decide which library to
@@ -803,7 +803,7 @@ public class BaseNoGui {
     // any new libraries found here are NEVER used, but they are added to the
     // end of already-found headers, to allow Compiler to report them if
     // the sketch tries to use them.
-    for (UserLibrary lib : librariesIndexer.getInstalledLibrariesWithDuplicates()) {
+    for (ContributedLibrary lib : librariesIndexer.getInstalledLibrariesWithDuplicates()) {
       try {
         String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
