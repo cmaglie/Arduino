@@ -435,6 +435,8 @@ public class ContributedLibrary extends DownloadableContribution {
   }
 
   public boolean isBefore(ContributedLibrary other) {
+    if (getVersion() == null)
+      return true;
     return VersionHelper.compare(getVersion(), other.getVersion()) < 0;
   }
 
