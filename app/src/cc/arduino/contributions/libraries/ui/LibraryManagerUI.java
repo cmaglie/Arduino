@@ -222,11 +222,14 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
 
   public void onInstallPressed(final ContributedLibrary lib) {
     List<ContributedLibrary> deps = BaseNoGui.librariesIndexer.getIndex().resolveDependeciesOf(lib);
-    final boolean installDeps;
+    MultiLibraryInstallDialog dialog;
+    boolean installDeps;
     if (deps.size() > 1) {
-      System.out.println("The library requires dependencies!");
-      installDeps = true;
+      dialog = new MultiLibraryInstallDialog(this, "Dependencies required");
+      dialog.setVisible(true);
+      installDeps = dialog.getInstallDepsResult();
     } else {
+      dialog = null;
       installDeps = false;
     }
     clearErrorMessage();
@@ -234,7 +237,7 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
       try {
         setProgressVisible(true, tr("Installing..."));
         if (installDeps) {
-          installer.install(deps, this::setProgress);
+          installer.install(deps, dialog::setProgress);
         } else {
           installer.install(lib, this::setProgress);
         }
