@@ -27,12 +27,9 @@
  * the GNU General Public License.
  */
 
-package cc.arduino.contributions.libraries.ui;
+package cc.arduino.contributions.libraries;
 
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
-import cc.arduino.contributions.filters.InstalledPredicate;
-import cc.arduino.contributions.libraries.ContributedLibrary;
-import cc.arduino.contributions.ui.FilteredAbstractTableModel;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -41,22 +38,22 @@ import java.util.stream.Collectors;
 
 public class ContributedLibraryReleases {
 
-  private final ContributedLibrary library;
-  private final List<ContributedLibrary> releases;
-  private final List<String> versions;
+  private ContributedLibrary latest;
+  private List<ContributedLibrary> releases;
+  private List<String> versions;
 
   private ContributedLibrary selected;
 
-  public ContributedLibraryReleases(ContributedLibrary library) {
-    this.library = library;
-    this.versions = new LinkedList<>();
-    this.releases = new LinkedList<>();
-    this.selected = null;
-    add(library);
+  public ContributedLibraryReleases(ContributedLibrary lib) {
+    latest = lib;
+    versions = new LinkedList<>();
+    releases = new LinkedList<>();
+    selected = null;
+    add(lib);
   }
 
   public ContributedLibrary getLibrary() {
-    return library;
+    return latest;
   }
 
   public List<ContributedLibrary> getReleases() {
@@ -64,7 +61,7 @@ public class ContributedLibraryReleases {
   }
 
   public boolean shouldContain(ContributedLibrary lib) {
-    return lib.getName().equals(library.getName());
+    return lib.getName().equals(latest.getName());
   }
 
   public void add(ContributedLibrary library) {
@@ -73,22 +70,24 @@ public class ContributedLibraryReleases {
     if (version != null) {
       versions.add(version);
     }
-    selected = getLatest();
+    if (latest.isBefore(library)) {
+      latest = library;
+    }
+    selected = latest;
   }
 
   public ContributedLibrary getInstalled() {
-    List<ContributedLibrary> installedReleases = releases.stream().filter(new InstalledPredicate()).collect(Collectors.toList());
-    Collections.sort(installedReleases, new DownloadableContributionBuiltInAtTheBottomComparator());
-
+    List<ContributedLibrary> installedReleases = releases.stream().filter(l -> l.isInstalled()).collect(Collectors.toList());
     if (installedReleases.isEmpty()) {
       return null;
     }
 
+    Collections.sort(installedReleases, new DownloadableContributionBuiltInAtTheBottomComparator());
     return installedReleases.get(0);
   }
 
   public ContributedLibrary getLatest() {
-    return FilteredAbstractTableModel.getLatestOf(releases);
+    return latest;
   }
 
   public ContributedLibrary getSelected() {
