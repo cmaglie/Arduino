@@ -30,7 +30,6 @@ package processing.app.packages;
 
 import cc.arduino.Constants;
 import cc.arduino.contributions.libraries.ContributedLibrary;
-import cc.arduino.contributions.libraries.ContributedLibraryDependency;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
@@ -38,22 +37,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class UserLibrary extends ContributedLibrary {
 
-  private String name;
-  private String version;
-  private String author;
-  private String maintainer;
-  private String sentence;
-  private String paragraph;
-  private String website;
-  private String category;
-  private String license;
-  private List<String> architectures;
-  private List<String> types;
   private List<String> declaredTypes;
   private boolean onGoingDevelopment;
   private List<String> includes;
@@ -142,16 +131,16 @@ public class UserLibrary extends ContributedLibrary {
     UserLibrary res = new UserLibrary();
     res.setInstalledFolder(libFolder);
     res.setInstalled(true);
-    res.name = properties.get("name").trim();
-    res.version = properties.get("version").trim();
-    res.author = properties.get("author").trim();
-    res.maintainer = properties.get("maintainer").trim();
-    res.sentence = properties.get("sentence").trim();
-    res.paragraph = properties.get("paragraph").trim();
-    res.website = properties.get("url").trim();
-    res.category = category.trim();
-    res.license = license.trim();
-    res.architectures = archs;
+    res.setName(properties.get("name").trim());
+    res.setVersion(properties.get("version").trim());
+    res.setAuthor(properties.get("author").trim());
+    res.setMaintainer(properties.get("maintainer").trim());
+    res.setSentence(properties.get("sentence").trim());
+    res.setParagraph(properties.get("paragraph").trim());
+    res.setWebsite(properties.get("url").trim());
+    res.setCategory(category.trim());
+    res.setLicense(license.trim());
+    res.setArchitectures(archs);
     res.layout = layout;
     res.declaredTypes = typesList;
     res.onGoingDevelopment = Files.exists(Paths.get(libFolder.getAbsolutePath(), Constants.LIBRARY_DEVELOPMENT_FLAG_FILE));
@@ -159,93 +148,17 @@ public class UserLibrary extends ContributedLibrary {
     return res;
   }
 
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public List<String> getArchitectures() {
-    return architectures;
-  }
-
-  @Override
-  public String getAuthor() {
-    return author;
-  }
-
-  @Override
-  public String getParagraph() {
-    return paragraph;
-  }
-
-  @Override
-  public String getSentence() {
-    return sentence;
-  }
-
-  @Override
-  public String getWebsite() {
-    return website;
-  }
-
-  @Override
-  public String getCategory() {
-    return category;
-  }
-
-  @Override
-  public List<String> getTypes() {
-    return types;
-  }
-
-  public void setTypes(List<String> types) {
-    this.types = types;
-  }
-
-  @Override
-  public String getLicense() {
-    return license;
-  }
-
-  @Override
-  public void setCategory(String category) {
-    this.category = category;
-  }
-
-  @Override
-  public String getVersion() {
-    return version;
-  }
-
-  @Override
-  public String getMaintainer() {
-    return maintainer;
-  }
-
-  @Override
-  public String getChecksum() {
-    return null;
-  }
-
-  @Override
-  public long getSize() {
-    return 0;
-  }
-
-  @Override
-  public String getUrl() {
-    return null;
-  }
-
-  @Override
-  public String getArchiveFileName() {
-    return null;
-  }
-
-  @Override
-  public List<ContributedLibraryDependency> getRequires() {
-    return null;
+  public static UserLibrary createFromLegacyPre15ArduinoIDE(File libFolder) {
+    // construct an old style library
+    UserLibrary res = new UserLibrary();
+    res.setInstalledFolder(libFolder);
+    res.setInstalled(true);
+    res.layout = LibraryLayout.FLAT;
+    res.setName(libFolder.getName());
+    res.setTypes(Arrays.asList("Contributed"));
+    res.setCategory("Uncategorized");
+    res.setArchitectures(Arrays.asList("*"));
+    return res;
   }
 
   public List<String> getDeclaredTypes() {
@@ -283,14 +196,15 @@ public class UserLibrary extends ContributedLibrary {
 
   @Override
   public String toString() {
-    String res = "Library: " + name + "\n";
-    res += "         (version=" + version + ")\n";
-    res += "         (author=" + author + ")\n";
-    res += "         (maintainer=" + maintainer + ")\n";
-    res += "         (sentence=" + sentence + ")\n";
-    res += "         (paragraph=" + paragraph + ")\n";
-    res += "         (url=" + website + ")\n";
-    res += "         (architectures=" + architectures + ")\n";
+    String res = "Library: " + getName() + "\n";
+    res += "         (version=" + getVersion() + ")\n";
+    res += "         (author=" + getAuthor() + ")\n";
+    res += "         (maintainer=" + getMaintainer() + ")\n";
+    res += "         (sentence=" + getSentence() + ")\n";
+    res += "         (paragraph=" + getParagraph() + ")\n";
+    res += "         (url=" + getWebsite() + ")\n";
+    res += "         (category=" + getCategory() + ")\n";
+    res += "         (architectures=" + getArchitectures() + ")\n";
     if (includes != null)
       res += "         (includes=" + includes + ")\n";
     return res;

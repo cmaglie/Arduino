@@ -34,35 +34,134 @@ import static processing.app.I18n.tr;
 import java.util.Comparator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.VersionHelper;
 import processing.app.I18n;
 
 public abstract class ContributedLibrary extends DownloadableContribution {
 
-  public abstract String getName();
+  @JsonProperty("name")
+  private String name;
 
-  public abstract String getMaintainer();
+  public String getName() {
+    return name;
+  }
 
-  public abstract String getAuthor();
+  public void setName(String name) {
+    this.name = name;
+  }
 
-  public abstract String getWebsite();
+  @JsonProperty("maintainer")
+  private String maintainer;
 
-  public abstract String getCategory();
+  public String getMaintainer() {
+    return maintainer;
+  }
 
-  public abstract void setCategory(String category);
+  public void setMaintainer(String maintainer) {
+    this.maintainer = maintainer;
+  }
 
-  public abstract String getLicense();
+  @JsonProperty("author")
+  private String author;
 
-  public abstract String getParagraph();
+  public String getAuthor() {
+    return author;
+  }
 
-  public abstract String getSentence();
+  public void setAuthor(String author) {
+    this.author = author;
+  }
 
-  public abstract List<String> getArchitectures();
+  @JsonProperty("website")
+  private String website;
 
-  public abstract List<String> getTypes();
+  public String getWebsite() {
+    return website;
+  }
 
-  public abstract List<ContributedLibraryDependency> getRequires();
+  public void setWebsite(String website) {
+    this.website = website;
+  }
+
+  @JsonProperty("category")
+  private String category;
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  @JsonProperty("license")
+  private String license;
+
+  public String getLicense() {
+    return license;
+  }
+
+  public void setLicense(String license) {
+    this.license = license;
+  }
+
+  @JsonProperty("paragraph")
+  private String paragraph;
+
+  public String getParagraph() {
+    return paragraph;
+  }
+
+  public void setParagraph(String paragraph) {
+    this.paragraph = paragraph;
+  }
+
+  @JsonProperty("sentence")
+  private String sentence;
+
+  public String getSentence() {
+    return sentence;
+  }
+
+  public void setSentence(String sentence) {
+    this.sentence = sentence;
+  }
+
+  @JsonProperty("architectures")
+  private List<String> architectures;
+
+  public List<String> getArchitectures() {
+    return architectures;
+  }
+
+  public void setArchitectures(List<String> architectures) {
+    this.architectures = architectures;
+  }
+
+  @JsonProperty("types")
+  private List<String> types;
+
+  public List<String> getTypes() {
+    return types;
+  }
+
+  public void setTypes(List<String> types) {
+    this.types = types;
+  }
+
+  @JsonProperty("requires")
+  private List<ContributedLibraryDependency> requires;
+
+  public List<ContributedLibraryDependency> getRequires() {
+    return requires;
+  }
+
+  public void setRequires(List<ContributedLibraryDependency> requires) {
+    this.requires = requires;
+  }
 
   public static final Comparator<ContributedLibrary> CASE_INSENSITIVE_ORDER = (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName());
 

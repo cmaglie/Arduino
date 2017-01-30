@@ -29,27 +29,69 @@
 
 package cc.arduino.contributions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.zafarkhaja.semver.Version;
 
 import java.io.File;
 
 public abstract class DownloadableContribution {
 
-  private boolean installed;
-  private File installedFolder;
+  @JsonProperty("url")
+  private String url;
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
+  @JsonProperty("version")
+  private String version;
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  @JsonProperty("checksum")
+  private String checksum;
+
+  public String getChecksum() {
+    return checksum;
+  }
+
+  public void setChecksum(String checksum) {
+    this.checksum = checksum;
+  }
+
+  @JsonProperty("size")
+  private long size;
+
+  public long getSize() {
+    return size;
+  }
+
+  public void setSize(long size) {
+    this.size = size;
+  }
+
+  @JsonProperty("archiveFileName")
+  private String archiveFileName;
+
+  public String getArchiveFileName() {
+    return archiveFileName;
+  }
+
+  public void setArchiveFileName(String archiveFileName) {
+    this.archiveFileName = archiveFileName;
+  }
 
   private boolean downloaded;
-  private File downloadedFile;
-
-  public abstract String getUrl();
-
-  public abstract String getVersion();
-
-  public abstract String getChecksum();
-
-  public abstract long getSize();
-
-  public abstract String getArchiveFileName();
 
   public boolean isDownloaded() {
     return downloaded;
@@ -59,6 +101,8 @@ public abstract class DownloadableContribution {
     this.downloaded = downloaded;
   }
 
+  private File downloadedFile;
+
   public File getDownloadedFile() {
     return downloadedFile;
   }
@@ -67,6 +111,8 @@ public abstract class DownloadableContribution {
     this.downloadedFile = downloadedFile;
   }
 
+  private boolean installed;
+
   public boolean isInstalled() {
     return installed;
   }
@@ -74,6 +120,8 @@ public abstract class DownloadableContribution {
   public void setInstalled(boolean installed) {
     this.installed = installed;
   }
+
+  private File installedFolder;
 
   public File getInstalledFolder() {
     return installedFolder;
@@ -94,18 +142,19 @@ public abstract class DownloadableContribution {
   }
 
   public String getParsedVersion() {
-    Version version = VersionHelper.valueOf(getVersion());
-    if (version == null) {
+    Version ver = VersionHelper.valueOf(getVersion());
+    if (ver == null) {
       return null;
     }
-    return version.toString();
+    return ver.toString();
   }
 
   @Override
   public String toString() {
     String res = "";
     if (installed) {
-      res += "installed on " + installedFolder.getAbsolutePath() + " (" + getSize() + " bytes)";
+      res += "installed on " + installedFolder.getAbsolutePath() + " ("
+             + getSize() + " bytes)";
     }
     return res;
   }
