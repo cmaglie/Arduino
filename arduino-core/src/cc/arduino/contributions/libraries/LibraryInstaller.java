@@ -29,6 +29,12 @@
 
 package cc.arduino.contributions.libraries;
 
+import static processing.app.I18n.tr;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 import cc.arduino.Constants;
 import cc.arduino.contributions.DownloadableContributionsDownloader;
 import cc.arduino.contributions.GZippedJsonDownloader;
@@ -39,14 +45,7 @@ import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.Platform;
 import processing.app.helpers.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import static processing.app.I18n.tr;
+import processing.app.packages.LibraryList;
 
 public class LibraryInstaller {
 
@@ -86,12 +85,12 @@ public class LibraryInstaller {
   }
 
   public void install(ContributedLibrary lib, ProgressListener progressListener) throws Exception {
-    ArrayList<ContributedLibrary> libs = new ArrayList<>();
+    LibraryList libs = new LibraryList();
     libs.add(lib);
     install(libs, progressListener);
   }
 
-  public synchronized void install(List<ContributedLibrary> libs, ProgressListener progressListener) throws Exception {
+  public synchronized void install(LibraryList libs, ProgressListener progressListener) throws Exception {
     MultiStepProgress progress = new MultiStepProgress(3 * libs.size() + 1);
 
     for (ContributedLibrary lib : libs) {

@@ -38,7 +38,6 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Predicate;
 
 import javax.swing.Box;
@@ -59,6 +58,7 @@ import cc.arduino.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
 import processing.app.BaseNoGui;
+import processing.app.packages.LibraryList;
 
 @SuppressWarnings("serial")
 public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
@@ -221,7 +221,7 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
   }
 
   public void onInstallPressed(final ContributedLibrary lib) {
-    List<ContributedLibrary> deps = BaseNoGui.librariesIndexer.getIndex().resolveDependeciesOf(lib);
+    LibraryList deps = BaseNoGui.librariesIndexer.getIndex().resolveDependeciesOf(lib);
     MultiLibraryInstallDialog dialog;
     boolean installDeps;
     if (deps.size() > 1) {

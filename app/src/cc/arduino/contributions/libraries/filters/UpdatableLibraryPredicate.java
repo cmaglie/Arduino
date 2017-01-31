@@ -29,12 +29,12 @@
 
 package cc.arduino.contributions.libraries.filters;
 
+import java.util.function.Predicate;
+
 import cc.arduino.contributions.VersionComparator;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import processing.app.BaseNoGui;
-
-import java.util.List;
-import java.util.function.Predicate;
+import processing.app.packages.LibraryList;
 
 public class UpdatableLibraryPredicate implements Predicate<ContributedLibrary> {
 
@@ -51,7 +51,7 @@ public class UpdatableLibraryPredicate implements Predicate<ContributedLibrary> 
     if (installed == null) {
       return false;
     }
-    List<ContributedLibrary> libraries = BaseNoGui.librariesIndexer.getIndex().find(libraryName);
+    LibraryList libraries = BaseNoGui.librariesIndexer.getIndex().find(libraryName);
     return libraries.stream()
       .filter(library -> versionComparator.greaterThan(library.getParsedVersion(), installed.getParsedVersion()))
       .count() > 0;

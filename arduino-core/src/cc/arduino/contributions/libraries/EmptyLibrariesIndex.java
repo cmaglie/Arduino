@@ -29,15 +29,14 @@
 
 package cc.arduino.contributions.libraries;
 
-import java.util.ArrayList;
-import java.util.List;
+import processing.app.packages.LibraryList;
 
 public class EmptyLibrariesIndex extends LibrariesIndex {
 
-  private List<ContributedLibrary> list = new ArrayList<>();
+  private LibraryList list = new LibraryList();
 
   @Override
-  public List<ContributedLibrary> getLibraries() {
+  public LibraryList getLibraries() {
     return list;
   }
 

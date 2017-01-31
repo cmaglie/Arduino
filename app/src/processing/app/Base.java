@@ -336,7 +336,7 @@ public class Base {
         if (libraryToInstallParts.length == 2) {
           selected = indexer.getIndex().find(libraryToInstallParts[0], VersionHelper.valueOf(libraryToInstallParts[1]).toString());
         } else if (libraryToInstallParts.length == 1) {
-          List<ContributedLibrary> librariesByName = indexer.getIndex().find(libraryToInstallParts[0]);
+          LibraryList librariesByName = indexer.getIndex().find(libraryToInstallParts[0]);
           Collections.sort(librariesByName, new DownloadableContributionVersionComparator());
           if (!librariesByName.isEmpty()) {
             selected = librariesByName.get(librariesByName.size() - 1);
@@ -1043,8 +1043,8 @@ public class Base {
     }
   }
 
-  private List<ContributedLibrary> getSortedLibraries() {
-    List<ContributedLibrary> installedLibraries = new LinkedList<>(BaseNoGui.librariesIndexer.getInstalledLibraries());
+  private LibraryList getSortedLibraries() {
+    LibraryList installedLibraries = new LibraryList(BaseNoGui.librariesIndexer.getInstalledLibraries());
     Collections.sort(installedLibraries, new LibraryByTypeComparator());
     Collections.sort(installedLibraries, new LibraryOfSameTypeComparator());
     return installedLibraries;
@@ -1076,7 +1076,7 @@ public class Base {
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
 
     if (targetPlatform != null) {
-      List<ContributedLibrary> libs = getSortedLibraries();
+      LibraryList libs = getSortedLibraries();
       String lastLibType = null;
       for (ContributedLibrary lib : libs) {
         if (lastLibType == null || !lastLibType.equals(lib.getTypes().get(0))) {

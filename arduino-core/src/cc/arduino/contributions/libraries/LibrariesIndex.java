@@ -29,24 +29,33 @@
 
 package cc.arduino.contributions.libraries;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.filters.LibraryWithNamePredicate;
+import processing.app.packages.LibraryList;
 
-public abstract class LibrariesIndex {
+public class LibrariesIndex {
 
-  public abstract List<ContributedLibrary> getLibraries();
+  private LibraryList libraries;
 
-  public List<ContributedLibrary> find(final String name) {
-    return getLibraries().stream().filter(new LibraryWithNamePredicate(name)).collect(Collectors.toList());
+  public LibrariesIndex(List<ContributedLibrary> _libraries) {
+    libraries = new LibraryList(_libraries);
+  }
+
+  public LibraryList getLibraries() {
+    return libraries;
+  }
+
+  public LibraryList find(final String name) {
+    return getLibraries().stream().filter(new LibraryWithNamePredicate(name)).collect(LibraryList.collector());
   }
 
   public ContributedLibrary find(String name, String version) {
@@ -97,7 +106,7 @@ public abstract class LibrariesIndex {
   }
 
   public ContributedLibrary getInstalled(String name) {
-    List<ContributedLibrary> installedReleases = find(name).stream().filter(new InstalledPredicate()).collect(Collectors.toList());
+    LibraryList installedReleases = find(name).stream().filter(new InstalledPredicate()).collect(LibraryList.collector());
     Collections.sort(installedReleases, new DownloadableContributionBuiltInAtTheBottomComparator());
 
     if (installedReleases.isEmpty()) {
@@ -107,8 +116,8 @@ public abstract class LibrariesIndex {
     return installedReleases.get(0);
   }
 
-  public List<ContributedLibrary> resolveDependeciesOf(ContributedLibrary library) {
-    List<ContributedLibrary> solution = new ArrayList<>();
+  public LibraryList resolveDependeciesOf(ContributedLibrary library) {
+    LibraryList solution = new LibraryList();
     solution.add(library);
     if (resolveDependeciesOf(solution, library)) {
       return solution;
@@ -117,7 +126,7 @@ public abstract class LibrariesIndex {
     }
   }
 
-  public boolean resolveDependeciesOf(List<ContributedLibrary> solution,
+  public boolean resolveDependeciesOf(LibraryList solution,
                                       ContributedLibrary library) {
     List<ContributedLibraryDependency> requirements = library.getRequires();
     if (requirements == null) {
@@ -137,7 +146,7 @@ public abstract class LibrariesIndex {
         continue;
 
       // Generate possible matching dependencies
-      List<ContributedLibrary> possibleDeps = findMatchingDependencies(dep);
+      LibraryList possibleDeps = findMatchingDependencies(dep);
 
       // If there are no dependencies available add as "missing" lib
       if (possibleDeps.isEmpty()) {
@@ -158,8 +167,8 @@ public abstract class LibrariesIndex {
     return true;
   }
 
-  private List<ContributedLibrary> findMatchingDependencies(ContributedLibraryDependency dep) {
-    List<ContributedLibrary> available = find(dep.getName());
+  private LibraryList findMatchingDependencies(ContributedLibraryDependency dep) {
+    LibraryList available = find(dep.getName());
     if (dep.getVersionRequired() == null || dep.getVersionRequired().isEmpty())
       return available;
 
@@ -167,7 +176,7 @@ public abstract class LibrariesIndex {
     // constraints requires a much complex backtracking algorithm, the following
     // is just a draft placeholder.
 
-//    List<ContributedLibrary> match = available.stream()
+//    LibraryList match = available.stream()
 //        // TODO: add more complex version comparators (> >= < <= ~ 1.0.* 1.*...)
 //        .filter(candidate -> candidate.getParsedVersion()
 //            .equals(dep.getVersionRequired()))

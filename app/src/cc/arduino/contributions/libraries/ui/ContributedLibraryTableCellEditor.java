@@ -50,6 +50,7 @@ import cc.arduino.contributions.libraries.ContributedLibraryReleases;
 import cc.arduino.contributions.libraries.filters.OnlyUpstreamReleasePredicate;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.utils.ReverseComparator;
+import processing.app.packages.LibraryList;
 
 @SuppressWarnings("serial")
 public class ContributedLibraryTableCellEditor extends InstallerTableCell {
@@ -85,15 +86,15 @@ public class ContributedLibraryTableCellEditor extends InstallerTableCell {
 
     final ContributedLibrary installed = editorValue.getInstalled();
 
-    List<ContributedLibrary> releases = editorValue.getReleases().stream()
+    LibraryList releases = editorValue.getReleases().stream()
         .filter(new OnlyUpstreamReleasePredicate())
-        .collect(Collectors.toList());
-    List<ContributedLibrary> uninstalledReleases = releases.stream()
-        .filter(new InstalledPredicate().negate()).collect(Collectors.toList());
+        .collect(LibraryList.collector());
+    LibraryList uninstalledReleases = releases.stream()
+        .filter(new InstalledPredicate().negate()).collect(LibraryList.collector());
 
-    List<ContributedLibrary> installedBuiltIn = releases.stream()
+    LibraryList installedBuiltIn = releases.stream()
         .filter(new InstalledPredicate()).filter(new BuiltInPredicate())
-        .collect(Collectors.toList());
+        .collect(LibraryList.collector());
 
     if (installed != null && !installedBuiltIn.contains(installed)) {
       uninstalledReleases.addAll(installedBuiltIn);
@@ -105,8 +106,8 @@ public class ContributedLibraryTableCellEditor extends InstallerTableCell {
     editorCell.downgradeChooser.removeAllItems();
     editorCell.downgradeChooser.addItem(tr("Select version"));
 
-    final List<ContributedLibrary> uninstalledPreviousReleases = new LinkedList<>();
-    final List<ContributedLibrary> uninstalledNewerReleases = new LinkedList<>();
+    final LibraryList uninstalledPreviousReleases = new LibraryList();
+    final LibraryList uninstalledNewerReleases = new LibraryList();
 
     final VersionComparator versionComparator = new VersionComparator();
     uninstalledReleases.stream().forEach(input -> {

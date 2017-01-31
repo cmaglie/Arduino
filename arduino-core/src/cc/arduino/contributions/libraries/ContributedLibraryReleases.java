@@ -29,17 +29,18 @@
 
 package cc.arduino.contributions.libraries;
 
-import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
+import processing.app.packages.LibraryList;
+
 public class ContributedLibraryReleases {
 
   private ContributedLibrary latest;
-  private List<ContributedLibrary> releases;
+  private LibraryList releases;
   private List<String> versions;
 
   private ContributedLibrary selected;
@@ -47,7 +48,7 @@ public class ContributedLibraryReleases {
   public ContributedLibraryReleases(ContributedLibrary lib) {
     latest = lib;
     versions = new LinkedList<>();
-    releases = new LinkedList<>();
+    releases = new LibraryList();
     selected = null;
     add(lib);
   }
@@ -56,7 +57,7 @@ public class ContributedLibraryReleases {
     return latest;
   }
 
-  public List<ContributedLibrary> getReleases() {
+  public LibraryList getReleases() {
     return releases;
   }
 
@@ -77,7 +78,7 @@ public class ContributedLibraryReleases {
   }
 
   public ContributedLibrary getInstalled() {
-    List<ContributedLibrary> installedReleases = releases.stream().filter(l -> l.isInstalled()).collect(Collectors.toList());
+    LibraryList installedReleases = releases.stream().filter(l -> l.isInstalled()).collect(LibraryList.collector());
     if (installedReleases.isEmpty()) {
       return null;
     }

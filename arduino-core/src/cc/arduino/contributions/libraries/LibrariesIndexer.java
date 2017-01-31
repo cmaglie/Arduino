@@ -88,12 +88,17 @@ public class LibrariesIndexer {
       mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
       mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      index = mapper.readValue(indexIn, LibrariesIndex.class);
-
-      index.getLibraries()
+      class LibIndexJson {
+        @JsonProperty("libraries")
+        public List<ContributedLibrary> libraries;
+      }
+      LibIndexJson idx = mapper.readValue(indexIn, LibIndexJson.class);
+      idx.libraries
         .stream()
         .filter(library -> library.getCategory() == null || "".equals(library.getCategory()) || !Constants.LIBRARY_CATEGORIES.contains(library.getCategory()))
         .forEach(library -> library.setCategory("Uncategorized"));
+
+      index = new LibrariesIndex(idx.libraries);
     } finally {
       IOUtils.closeQuietly(indexIn);
     }

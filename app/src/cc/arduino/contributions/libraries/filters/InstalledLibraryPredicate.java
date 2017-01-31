@@ -29,12 +29,12 @@
 
 package cc.arduino.contributions.libraries.filters;
 
+import java.util.function.Predicate;
+
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import processing.app.BaseNoGui;
-
-import java.util.List;
-import java.util.function.Predicate;
+import processing.app.packages.LibraryList;
 
 public class InstalledLibraryPredicate implements Predicate<ContributedLibrary> {
 
@@ -44,16 +44,11 @@ public class InstalledLibraryPredicate implements Predicate<ContributedLibrary> 
       return true;
     }
 
-    List<ContributedLibrary> libraries = BaseNoGui.librariesIndexer.getIndex().find(input.getName());
+    LibraryList libraries = BaseNoGui.librariesIndexer.getIndex().find(input.getName());
 
     return libraries.stream()
       .filter(new InstalledPredicate())
       .count() > 0;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    return obj instanceof InstalledLibraryPredicate;
   }
 
 }
