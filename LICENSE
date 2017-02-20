@@ -1,0 +1,22 @@
+
+This file summarize licensing information for parts of Arduino. Anyway,
+this is just a recap and doesn't replace the licensing for each part
+of Arduino, please **always check directly the source code for the
+correct and updated license information**.
+
+- The Arduino IDE is a Java app that is contained in the folders `app`
+and `arduino-core`. This app is a fork of Processing and is released
+under the GPL-2.0 license.
+
+- The Arduino Core for AVR microcontrollers is an embedded-C framework,
+the source code is in the `hardware/arduino/avr` folder and is released
+under the LGPL-2.1 license unless otherwise specified.
+
+- The Arduino Libraries are embedded-C libraries to be used in
+microcontrollers, the source code is in the `libraries` folder they are
+released under various license: LGPL-2.1, Apache-2.0, BSD-3-clause, MIT2
+Please refer to the source code of each library for the correct license.
+
+- The Arduino Examples, contained in the `build/shared/examples` folder
+are released in the public-domain.
+

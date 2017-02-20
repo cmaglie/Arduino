@@ -1,15 +1,3 @@
-this file includes licensing information for parts of arduino.
-
-first, the gnu general public license, which covers the main body 
-of the processing/arduino code (in general, all the stuff inside the 'app'
-and 'core' subfolders).
-
-next, the gnu lesser general public license that covers the arduino core
-and libraries.
-
-
-.....................................................................
-
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991
