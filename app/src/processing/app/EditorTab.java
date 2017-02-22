@@ -28,8 +28,6 @@ import static processing.app.Theme.scale;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.Action;
@@ -191,56 +189,32 @@ public class EditorTab extends JPanel implements SketchFile.TextStorage {
     menu.add(item);
     
     item = new JMenuItem(tr("Comment/Uncomment"), '/');
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleCommentUncomment();
-        }
-    });
+    item.addActionListener(e -> handleCommentUncomment());
     menu.add(item);
 
     item = new JMenuItem(tr("Increase Indent"), ']');
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleIndentOutdent(true);
-        }
-    });
+    item.addActionListener(e -> handleIndentOutdent(true));
     menu.add(item);
 
     item = new JMenuItem(tr("Decrease Indent"), '[');
     item.setName("menuDecreaseIndent");
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleIndentOutdent(false);
-        }
-    });
+    item.addActionListener(e -> handleIndentOutdent(false));
     menu.add(item);
 
     item = new JMenuItem(tr("Copy for Forum"));
-    item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        handleDiscourseCopy();
-      }
-    });
+    item.addActionListener(e -> handleDiscourseCopy());
     menu.add(item);
 
     item = new JMenuItem(tr("Copy as HTML"));
-    item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        handleHTMLCopy();
-      }
-    });
+    item.addActionListener(e -> handleHTMLCopy());
     menu.add(item);
 
     final JMenuItem referenceItem = new JMenuItem(tr("Find in Reference"));
-    referenceItem.addActionListener(editor::handleFindReference);
+    referenceItem.addActionListener(e -> editor.handleFindReference());
     menu.add(referenceItem);  
 
     final JMenuItem openURLItem = new JMenuItem(tr("Open URL"));
-    openURLItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        Base.openURL(e.getActionCommand());
-      }
-    });
+    openURLItem.addActionListener(e -> Base.openURL(e.getActionCommand()));
     menu.add(openURLItem);   
     
     menu.addPopupMenuListener(new PopupMenuListener() {
