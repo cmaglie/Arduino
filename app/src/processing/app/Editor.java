@@ -619,7 +619,7 @@ public class Editor extends JFrame implements RunnerListener {
     sketchMenu.removeAll();
 
     JMenuItem item = newJMenuItem(tr("Verify/Compile"), 'R');
-    item.addActionListener(e -> handleRun(false, Editor.this.presentHandler, Editor.this.runHandler));
+    item.addActionListener(e -> handleRun(false, presentHandler, runHandler));
     sketchMenu.add(item);
 
     item = newJMenuItem(tr("Upload"), 'U');
@@ -638,8 +638,8 @@ public class Editor extends JFrame implements RunnerListener {
         return;
       }
       handleRun(false, new ShouldSaveReadOnly(),
-                Editor.this.presentAndSaveHandler,
-                Editor.this.runAndSaveHandler);
+                presentAndSaveHandler,
+                runAndSaveHandler);
     });
     sketchMenu.add(item);
 
