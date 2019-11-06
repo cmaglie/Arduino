@@ -212,7 +212,8 @@ public class Platform extends processing.app.Platform {
     return scripts;
   }
 
-  public void symlink(File something, File somewhere) throws IOException, InterruptedException {
+  @Override
+  public void symlink(String something, File somewhere) throws IOException, InterruptedException {
   }
 
   @Override
