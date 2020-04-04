@@ -19,7 +19,7 @@ jobs:
     - name: Install X virtual framebuffer
       run: sudo apt-get install -y xvfb
     - name: Run tests
-      working-directory: ./app
+      working-directory: ./build
       run: xvfb-run --auto-servernum --server-args "-screen 0 1024x768x24" ant test
     - name: Cleanup xvfb
       uses: bcomnes/cleanup-xvfb@v1
@@ -32,9 +32,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+        architecture: x86
     - name: Build with Ant
       working-directory: ./build
-      run: ant clean build
+      run: |
+        java -version
+        ant clean build
     - name: Run tests
-      working-directory: ./app
+      working-directory: ./build
       run: ant test
