@@ -393,7 +393,7 @@
     <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler-1.0ea-arduino5/appbundler-1.0ea-arduino5.jar"/>
 
     <bundleapp
-            jvmRequired="1.8"
+            jvmRequired="11"
             jrepreferred="true"
             outputdirectory="${staging_folder}/work"
             name="Arduino"
