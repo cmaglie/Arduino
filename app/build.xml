@@ -122,6 +122,7 @@
         <path refid="class.path.test"/>
       </classpath>
 
+      <formatter type="plain" usefile="false" /> <!-- to screen -->
       <formatter type="xml"/>
 
       <batchtest fork="yes" todir="test-bin">
