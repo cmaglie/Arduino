@@ -33,6 +33,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.assertj.core.api.Assertions;
@@ -61,7 +63,7 @@ public class CommandLineTest {
       arduinoPath = new File(buildPath, "build/linux/work/arduino");
     }
     if (OSUtils.isWindows()) {
-      arduinoPath = new File(buildPath, "build/windows/work/arduino.exe");
+      arduinoPath = new File(buildPath, "build/windows/work/arduino_debug.exe");
     }
     if (OSUtils.isMacOS()) {
       arduinoPath = new File(buildPath,
@@ -73,14 +75,28 @@ public class CommandLineTest {
     System.out.println("found arduino: " + arduinoPath);
   }
 
+  private void consume(InputStream s) {
+    new Thread(() -> {
+      try {
+        IOUtils.copy(s, System.out);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }).start();
+  }
+
   @Test
   public void testCommandLineBuildWithRelativePath() throws Exception {
     Runtime rt = Runtime.getRuntime();
     File wd = new File(buildPath, "build/shared/examples/01.Basics/Blink/");
-    Process pr = rt
-        .exec(arduinoPath + " --board arduino:avr:uno --verify Blink.ino", null,
-              wd);
-    IOUtils.copy(pr.getInputStream(), System.out);
+    String[] cmd = new String[] {
+        arduinoPath.getAbsolutePath(),
+        "--board", "arduino:avr:uno",
+        "--verify", "Blink.ino"
+    };
+    Process pr = rt.exec(cmd, null, wd);
+    consume(pr.getInputStream());
+    consume(pr.getErrorStream());
     pr.waitFor();
     assertEquals(0, pr.exitValue());
   }
@@ -91,14 +107,15 @@ public class CommandLineTest {
     File prefFile = File.createTempFile("test_pref", ".txt");
     prefFile.deleteOnExit();
 
-    Process pr = rt.exec(new String[] {
-        arduinoPath.getAbsolutePath(),
-        "--save-prefs",
-        "--preferences-file", prefFile.getAbsolutePath(),
-        "--get-pref", // avoids starting the GUI
-    });
-    IOUtils.copy(pr.getInputStream(), System.out);
-    IOUtils.copy(pr.getErrorStream(), System.out);
+    String[] cmd = new String[] {
+      arduinoPath.getAbsolutePath(),
+      "--save-prefs",
+      "--preferences-file", prefFile.getAbsolutePath(),
+      "--get-pref", // avoids starting the GUI
+    };
+    Process pr = rt.exec(cmd);
+    consume(pr.getInputStream());
+    consume(pr.getErrorStream());
     pr.waitFor();
     assertEquals(0, pr.exitValue());
 
@@ -107,8 +124,8 @@ public class CommandLineTest {
         "--pref", "test_pref=xxx",
         "--preferences-file", prefFile.getAbsolutePath(),
     });
-    IOUtils.copy(pr.getInputStream(), System.out);
-    IOUtils.copy(pr.getErrorStream(), System.out);
+    consume(pr.getInputStream());
+    consume(pr.getErrorStream());
     pr.waitFor();
     assertEquals(0, pr.exitValue());
 
@@ -121,8 +138,8 @@ public class CommandLineTest {
         "--preferences-file", prefFile.getAbsolutePath(),
         "--save-prefs",
     });
-    IOUtils.copy(pr.getInputStream(), System.out);
-    IOUtils.copy(pr.getErrorStream(), System.out);
+    consume(pr.getInputStream());
+    consume(pr.getErrorStream());
     pr.waitFor();
     assertEquals(0, pr.exitValue());
 
@@ -137,6 +154,7 @@ public class CommandLineTest {
       arduinoPath.getAbsolutePath(),
       "--version",
     });
+    consume(pr.getErrorStream());
     pr.waitFor();
 
     Assertions.assertThat(pr.exitValue())
@@ -154,6 +172,8 @@ public class CommandLineTest {
       "--version",
       "--verify",
     });
+    consume(pr.getInputStream());
+    consume(pr.getErrorStream());
     pr.waitFor();
 
     Assertions.assertThat(pr.exitValue())
