@@ -30,8 +30,6 @@
 package cc.arduino.utils.network;
 
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import processing.app.helpers.FileUtils;
 
 import javax.script.ScriptException;
@@ -48,9 +46,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class FileDownloader extends Observable {
-  private static Logger log = LogManager.getLogger(FileDownloader.class);
+  private static Logger log = Logger.getLogger(FileDownloader.class.getName());
 
   public enum Status {
     CONNECTING, //
@@ -146,14 +145,14 @@ public class FileDownloader extends Observable {
       try {
         FileDownloaderCache.getFileCached(url).ifPresent(fileCached -> {
           try {
-            log.info("Invalidate this file {} that comes from {}", fileCached.getLocalPath(), fileCached.getRemoteURL());
+            log.info("Invalidate this file " + fileCached.getLocalPath() + " that comes from " + fileCached.getRemoteURL());
             fileCached.invalidateCache();
           } catch (Exception e) {
-            log.warn("Fail to invalidate cache", e);
+            log.warning("Fail to invalidate cache: " + e);
           }
         });
       } catch (URISyntaxException | NoSuchMethodException | ScriptException | IOException e) {
-        log.warn("Fail to get the file cached during the file invalidation", e);
+        log.warning("Fail to get the file cached during the file invalidation: " + e);
       }
     });
 
@@ -171,7 +170,7 @@ public class FileDownloader extends Observable {
         final Optional<File> fileFromCache = getFileCached(fileCached);
         if (fileCached.isNotChange() && fileFromCache.isPresent()) {
           // Copy the cached file in the destination file
-          log.info("The file will be taken from the cache {}", fileFromCache);
+          log.info("The file will be taken from the cache " + fileFromCache);
           FileUtils.copyFile(fileFromCache.get(), outputFile);
         } else {
           openConnectionAndFillTheFile(noResume);
@@ -191,12 +190,12 @@ public class FileDownloader extends Observable {
     } catch (SocketTimeoutException e) {
       setStatus(Status.CONNECTION_TIMEOUT_ERROR);
       setError(e);
-      log.error("The request went in socket timeout", e);
+      log.severe("The request went in socket timeout: " + e);
 
     } catch (Exception e) {
       setStatus(Status.ERROR);
       setError(e);
-      log.error("The request stop", e);
+      log.severe("The request stop: " + e);
     }
 
   }
@@ -207,18 +206,17 @@ public class FileDownloader extends Observable {
       final Optional<File> fileFromCache =
         fileCached.getFileFromCache();
       if (fileFromCache.isPresent()) {
-        log.info("No need to download using cached file: {}", fileCached);
+        log.info("No need to download using cached file: " + fileCached);
         return fileFromCache;
       } else {
         log.info(
-          "The file in the cache is not in the path or the md5 validation failed: path={}, file exist={}, md5 validation={}",
-          fileCached.getLocalPath(), fileCached.exists(), fileCached.md5Check());
+          "The file in the cache is not in the path or the md5 validation failed: path=" + fileCached.getLocalPath() +
+          ", file exist=" + fileCached.exists() + ", md5 validation=" + fileCached.md5Check());
       }
     } catch (Exception e) {
-      log.warn(
-        "Cannot get the file from the cache, will be downloaded a new one ", e);
+      log.warning("Cannot get the file from the cache, will be downloaded a new one: " + e);
     }
-    log.info("The file is change {}", fileCached);
+    log.info("The file is change " + fileCached);
     return Optional.empty();
   }
 

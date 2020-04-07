@@ -38,8 +38,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import processing.app.BaseNoGui;
 import processing.app.PreferencesData;
 import processing.app.helpers.FileUtils;
@@ -60,12 +58,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class FileDownloaderCache {
   private final static String CACHE_ENABLE_PREFERENCE_KEY = "cache.enable";
-  private final static Logger log = LogManager
-    .getLogger(FileDownloaderCache.class);
+  private final static Logger log = Logger.getLogger(FileDownloaderCache.class.getName());
   private final static Map<String, FileCached> cachedFiles = Collections
     .synchronizedMap(new HashMap<>());
   private final static String cacheFolder;
@@ -86,10 +84,10 @@ public class FileDownloaderCache {
     } else {
       enableCache = false;
       cacheFolder = null;
-      log.error("The cache will disable because the setting folder is null, cannot generate the cache path");
+      log.severe("The cache will disable because the setting folder is null, cannot generate the cache path");
     }
     final Path pathCacheInfo = getCachedInfoPath();
-    log.info("Cache folder {}", cacheFolder);
+    log.info("Cache folder " + cacheFolder);
     try {
       if (Files.exists(pathCacheInfo)) {
         ObjectMapper mapper = new ObjectMapper();
@@ -109,11 +107,11 @@ public class FileDownloaderCache {
             .collect(Collectors.toMap(FileCached::getRemoteURL, Function.identity()))
           )
         );
-        log.info("Number of file already in the cache {}", cachedFiles.size());
+        log.info("Number of file already in the cache " + cachedFiles.size());
 
       }
     } catch (Exception e) {
-      log.error("Cannot initialized the cache", e);
+      log.severe("Cannot initialized the cache: " + e);
     }
   }
 
@@ -133,7 +131,7 @@ public class FileDownloaderCache {
     }
     final String[] splitPath = remoteURL.getPath().split("/");
     if (splitPath.length == 0) {
-      log.warn("The remote path as no file name {}", remoteURL);
+      log.warning("The remote path as no file name " + remoteURL);
       return Optional.empty();
     }
     // Create the path where the cached file should exist
@@ -146,19 +144,19 @@ public class FileDownloaderCache {
       .orElseGet(() -> new FileCached(remoteURL.toString(), cacheFilePath.toString()));
 
     // If the file is change of the cache is disable run the HEAD request to check if the file is changed
-    log.info("Get file cached is expire {}, exist {}, info {} ", fileCached.isExpire(), fileCached.exists(), fileCached);
+    log.info("Get file cached is expire " + fileCached.isExpire() + ", exist " + fileCached.exists() + ", info " + fileCached);
     if (fileCached.isExpire() || !fileCached.exists()) {
       // Update remote etag and cache control header
       final Optional<FileCached> fileCachedInfoUpdated =
         FileDownloaderCache.updateCacheInfo(remoteURL, (remoteETagClean, cacheControl) -> {
           // Check cache control data
           if (cacheControl.isNoCache() || cacheControl.isMustRevalidate() || cacheControl.isNoStore()) {
-            log.warn("The file {} must not be cache due to cache control header {}",
-              remoteURL, cacheControl);
+            log.warning("The file " + remoteURL + " must not be cache due to cache control header " + cacheControl);
             return Optional.empty();
           }
-          log.info("Update cached info of {}, createdAt {}, previous eTag {}, last eTag {}, cache control header {} ",
-            remoteURL, fileCached.createdAt, fileCached.eTag, remoteETagClean, cacheControl);
+          log.info("Update cached info of " + remoteURL + ", createdAt " + fileCached.createdAt +
+                   ", previous eTag " + fileCached.eTag + ", last eTag " + remoteETagClean +
+                   ", cache control header " + cacheControl);
           final FileCached fileCachedUpdateETag = new FileCached(
             remoteURL.toString(),
             cacheFilePath.toString(),
@@ -185,14 +183,14 @@ public class FileDownloaderCache {
       try {
         connection.setRequestMethod("HEAD");
       } catch (ProtocolException e) {
-        log.error("Invalid protocol", e);
+        log.severe("Invalid protocol: " + e.getMessage());
       }
     });
     final int responseCode = headRequest.getResponseCode();
     headRequest.disconnect();
     // Something bad is happening return a conservative true to try to download the file
     if (responseCode < 200 || responseCode >= 300) {
-      log.warn("The head request return a bad response code " + responseCode);
+      log.warning("The head request return a bad response code " + responseCode);
       // if something bad happend
       return Optional.empty();
     }
@@ -204,7 +202,7 @@ public class FileDownloaderCache {
       final CacheControl cacheControl = CacheControl.valueOf(cacheControlHeader);
       return getNewFile.apply(remoteETagClean, cacheControl);
     }
-    log.warn("The head request do not return the ETag {} or the Cache-Control {}", remoteETag, cacheControlHeader);
+    log.warning("The head request do not return the ETag " + remoteETag + " or the Cache-Control " + cacheControlHeader);
     return Optional.empty();
   }
 
@@ -223,7 +221,7 @@ public class FileDownloaderCache {
     if (Files.notExists(cachedFileInfo)) {
       Files.createDirectories(cachedFileInfo.getParent());
     }
-    log.info("Update cache file info in {}, number of cached files is {}", cachedFileInfo.toFile(), cachedFiles.size());
+    log.info("Update cache file info in " + cachedFileInfo.toFile() + ", number of cached files is " + cachedFiles.size());
     // Write to cache.json
     mapper.writeValue(cachedFileInfo.toFile(), objectNode);
   }
@@ -289,14 +287,14 @@ public class FileDownloaderCache {
       // Check if the file is expire
       boolean isChange = false;
       if (isExpire()) {
-        log.debug("The file \"{}\" is expire. Expire time: {}", localPath,
-          this.getExpiresTime().format(DateTimeFormatter.ISO_DATE_TIME));
+        log.fine("The file \"" + localPath + "\" is expire. Expire time: " + 
+          getExpiresTime().format(DateTimeFormatter.ISO_DATE_TIME));
         isChange = true;
       }
 
       if (lastETag != null && !lastETag.equals(eTag)) {
         // If are different means that the file is change
-        log.debug("The file \"{}\" is changed last ETag != now Etag ({}!={})", localPath, lastETag, eTag);
+        log.fine("The file \"" + localPath + "\" is changed last ETag != now Etag (" + lastETag + "!=" + eTag + ")");
         isChange = true;
       }
       return isChange;
@@ -327,7 +325,7 @@ public class FileDownloaderCache {
       final String md5 = this.calculateMD5();
       final String eTag;
       if (lastETag == null) {
-        log.warn("The eTag was not calculate this time, is not the right behaviour fileCached={}, md5={}", this, md5);
+        log.warning("The eTag was not calculate this time, is not the right behaviour fileCached=" + this + ", md5=" + md5);
         eTag = this.eTag;
       } else {
         eTag = this.lastETag;
@@ -340,7 +338,7 @@ public class FileDownloaderCache {
         md5,
         this.cacheControl
       );
-      log.info("Update cache file: {}", newFileCached);
+      log.info("Update cache file: " + newFileCached);
       cachedFiles.put(remoteURL, newFileCached);
       updateCacheFilesInfo();
 
@@ -363,7 +361,7 @@ public class FileDownloaderCache {
       try {
         return !Objects.isNull(getMD5()) && Objects.equals(calculateMD5(), getMD5());
       } catch (Exception e) {
-        log.error("Fail to calculate the MD5. file={}", this, e);
+        log.severe("Fail to calculate the MD5. file=" + this + ": " + e);
         return false;
       }
     }

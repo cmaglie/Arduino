@@ -38,8 +38,6 @@ import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.network.FileDownloader;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.Platform;
@@ -53,11 +51,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import static processing.app.I18n.tr;
 
 public class LibraryInstaller {
-  private static Logger log = LogManager.getLogger(LibraryInstaller.class);
+  private static Logger log = Logger.getLogger(LibraryInstaller.class.getName());
 
   private final Platform platform;
   private final GPGDetachedSignatureVerifier signatureVerifier;
@@ -97,10 +96,10 @@ public class LibraryInstaller {
         }
       } else {
         FileDownloader.invalidateFiles(libraryGzURL, libraryURL, signatureUrl);
-        log.error("Fail to verify the signature of {} the cached files have been removed", libraryURL);
+        log.severe("Fail to verify the signature of " + libraryURL + " the cached files have been removed");
       }
     } else {
-      log.info("The domain is not selected to verify the signature. library index: {}", signatureUrl);
+      log.info("The domain is not selected to verify the signature. library index: " + signatureUrl);
     }
 
     // Step 2: Parse index

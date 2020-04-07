@@ -32,8 +32,6 @@ package cc.arduino.utils.network;
 import cc.arduino.net.CustomProxySelector;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import processing.app.BaseNoGui;
 import processing.app.PreferencesData;
 
@@ -45,9 +43,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class HttpConnectionManager {
-  private static Logger log = LogManager.getLogger(HttpConnectionManager.class);
+  private static Logger log = Logger.getLogger(HttpConnectionManager.class.getName());
   private static final String userAgent;
   private static final int connectTimeout;
   private static final int maxRedirectNumber;
@@ -73,8 +72,8 @@ public class HttpConnectionManager {
         Integer.parseInt(
           PreferencesData.get("http.connection_timeout_ms", "5000"));
     } catch (NumberFormatException e) {
-      log.warn(
-        "Cannot parse the http.connection_timeout configuration switch to default {} milliseconds", connectTimeoutFromConfig, e.getCause());
+      log.warning(
+        "Cannot parse the http.connection_timeout configuration switch to default " + connectTimeoutFromConfig + " milliseconds: " + e.getCause());
     }
     connectTimeout = connectTimeoutFromConfig;
     // Set by default 20 max redirect to follow
@@ -84,8 +83,8 @@ public class HttpConnectionManager {
         Integer.parseInt(
           PreferencesData.get("http.max_redirect_number", "20"));
     } catch (NumberFormatException e) {
-      log.warn(
-        "Cannot parse the http.max_redirect_number configuration switch to default {}", maxRedirectNumberConfig, e.getCause());
+      log.warning(
+        "Cannot parse the http.max_redirect_number configuration switch to default " + maxRedirectNumberConfig + ": " + e.getCause());
     }
     maxRedirectNumber = maxRedirectNumberConfig;
   }
@@ -116,13 +115,13 @@ public class HttpConnectionManager {
   private HttpURLConnection makeConnection(URL requestURL, int movedTimes,
                                            Consumer<HttpURLConnection> beforeConnection) throws IOException, URISyntaxException, ScriptException, NoSuchMethodException {
     if (movedTimes > maxRedirectNumber) {
-      log.warn("Too many redirect " + requestURL);
+      log.warning("Too many redirect " + requestURL);
       throw new IOException("Too many redirect " + requestURL);
     }
 
     Proxy proxy = new CustomProxySelector(PreferencesData.getMap())
       .getProxyFor(requestURL.toURI());
-    log.debug("Using proxy {}", proxy);
+    log.fine("Using proxy " + proxy);
 
     final String requestId = UUID.randomUUID().toString()
       .toUpperCase().replace("-", "").substring(0, 16);
@@ -145,12 +144,12 @@ public class HttpConnectionManager {
     beforeConnection.accept(connection);
 
     // Connect
-    log.info("Connect to {}, method={}, request id={}", requestURL, connection.getRequestMethod(), requestId);
+    log.info("Connect to " + requestURL + ", method=" + connection.getRequestMethod() + ", request id=" + requestId);
 
     connection.connect();
     int resp = connection.getResponseCode();
-    log.info("Request complete URL=\"{}\", method={}, response code={}, request id={}, headers={}",
-      requestURL, connection.getRequestMethod(), resp, requestId, StringUtils.join(connection.getHeaderFields()));
+    log.info("Request complete URL=\"" + requestURL + "\", method=" + connection.getRequestMethod() + ", response code=" + resp +
+             ", request id=" + requestId + ", headers=" + StringUtils.join(connection.getHeaderFields()));
 
     if (resp == HttpURLConnection.HTTP_MOVED_PERM
       || resp == HttpURLConnection.HTTP_MOVED_TEMP) {

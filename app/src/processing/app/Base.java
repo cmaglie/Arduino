@@ -45,6 +45,7 @@ import cc.arduino.view.SplashScreenHelper;
 import com.github.zafarkhaja.semver.Version;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -164,7 +165,7 @@ public class Base {
     consoleHandler.setLevel(Level.ALL);
     consoleHandler.setFormatter(new LogFormatter("%1$tl:%1$tM:%1$tS [%4$7s] %2$s: %5$s%n"));
 
-    Logger globalLogger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    Logger globalLogger = Logger.getGlobal();
     globalLogger.setLevel(consoleHandler.getLevel());
 
     // Remove default
@@ -183,7 +184,6 @@ public class Base {
     Logger.getLogger("cc.arduino.packages.autocomplete").setParent(globalLogger);
     Logger.getLogger("br.com.criativasoft.cpluslibparser").setParent(globalLogger);
     Logger.getLogger(Base.class.getPackage().getName()).setParent(globalLogger);
-
   }
 
   static protected boolean isCommandLine() {
@@ -199,12 +199,12 @@ public class Base {
   }
 
   public Base(String[] args) throws Exception {
+
     Thread deleteFilesOnShutdownThread = new Thread(DeleteFilesOnShutdown.INSTANCE);
     deleteFilesOnShutdownThread.setName("DeleteFilesOnShutdown");
     Runtime.getRuntime().addShutdownHook(deleteFilesOnShutdownThread);
 
     BaseNoGui.initLogger();
-
     initLogger();
 
     BaseNoGui.initPlatform();
@@ -219,12 +219,6 @@ public class Base {
     CommandlineParser parser = new CommandlineParser(args);
     parser.parseArgumentsPhase1();
     commandLine = !parser.isGuiMode();
-
-    // This configure the logs root folder
-    if (parser.isGuiMode()) {
-        System.out.println("Set log4j store directory " + BaseNoGui.getSettingsFolder().getAbsolutePath());
-    }
-    System.setProperty("log4j.dir", BaseNoGui.getSettingsFolder().getAbsolutePath());
 
     BaseNoGui.checkInstallationFolder();
 

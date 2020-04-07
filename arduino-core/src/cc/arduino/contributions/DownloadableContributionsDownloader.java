@@ -34,8 +34,6 @@ import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
 import cc.arduino.utils.network.FileDownloader;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import processing.app.BaseNoGui;
 import processing.app.PreferencesData;
 
@@ -43,12 +41,13 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import static processing.app.I18n.format;
 import static processing.app.I18n.tr;
 
 public class DownloadableContributionsDownloader {
-  private static Logger log = LogManager.getLogger(DownloadableContributionsDownloader.class);
+  private static Logger log = Logger.getLogger(DownloadableContributionsDownloader.class.getName());
 
   private final File stagingFolder;
 
@@ -169,16 +168,16 @@ public class DownloadableContributionsDownloader {
         if (checkSignature(progress, signatureUrl, progressListener, signatureVerifier, statusText, packageIndexTemp)) {
           Files.move(packageIndexTemp.toPath(), packageIndex.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } else {
-          log.info("The cached files have been removed. {} {}", packageIndexUrl, signatureUrl);
+          log.info("The cached files have been removed. " + packageIndexUrl + " " + signatureUrl);
           FileDownloader.invalidateFiles(packageIndexUrl, signatureUrl);
         }
       } else {
         // Move the package index to the destination when the signature is not necessary
         Files.move(packageIndexTemp.toPath(), packageIndex.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        log.info("The domain is not selected to verify the signature. will be copied into this path {}, packageIndex url: {}", packageIndex, packageIndexUrl);
+        log.info("The domain is not selected to verify the signature. will be copied into this path " + packageIndex + ", packageIndex url: " + packageIndexUrl);
       }
     } catch (Exception e) {
-      log.error("Cannot download the package index from {} the package will be discard", packageIndexUrl, e);
+      log.severe("Cannot download the package index from " + packageIndexUrl + " the package will be discard: " + e.getMessage());
       throw e;
     } finally {
       // Delete useless temp file
@@ -196,7 +195,7 @@ public class DownloadableContributionsDownloader {
     if (domain.contains(url.getHost())) {
       return true;
     } else {
-      log.info("The domain is not selected to verify the signature. domain list: {}, url: {}", domain, url);
+      log.info("The domain is not selected to verify the signature. domain list: " + domain + ", url: " + url);
       return false;
     }
   }
@@ -224,16 +223,17 @@ public class DownloadableContributionsDownloader {
       // Verify the signature before move the files
       final boolean signatureVerified = signatureVerifier.isSigned(fileToVerify, packageIndexSignatureTemp);
       if (signatureVerified) {
-        log.info("Signature verified. url={}, signature url={}, file to verify={}, signature file={}", signatureUrl, signatureUrl, fileToVerify, packageIndexSignatureTemp);
+        log.info("Signature verified. url=" + signatureUrl + ", signature url=" + signatureUrl +
+                 ", file to verify=" + fileToVerify + ", signature file=" + packageIndexSignatureTemp);
         // Move if the signature is ok
         Files.move(packageIndexSignatureTemp.toPath(), packageIndexSignature.toPath(), StandardCopyOption.REPLACE_EXISTING);
       } else {
-        log.error("{} file signature verification failed. File ignored.", signatureUrl);
+        log.severe(signatureUrl + " file signature verification failed. File ignored.");
         System.err.println(format(tr("{0} file signature verification failed. File ignored."), signatureUrl.toString()));
       }
       return signatureVerified;
     } catch (Exception e) {
-      log.error("Cannot download the signature from {} the package will be discard", signatureUrl, e);
+      log.severe("Cannot download the signature from " + signatureUrl + " the package will be discard: " + e);
       throw e;
     } finally {
       Files.deleteIfExists(packageIndexSignatureTemp.toPath());

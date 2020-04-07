@@ -42,8 +42,6 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.Platform;
@@ -59,13 +57,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static processing.app.I18n.format;
 import static processing.app.I18n.tr;
 
 public class ContributionInstaller {
-  private static Logger log = LogManager.getLogger(ContributionInstaller.class);
+  private static Logger log = Logger.getLogger(ContributionInstaller.class.getName());
 
   private final Platform platform;
   private final SignatureVerifier signatureVerifier;
@@ -272,8 +271,8 @@ public class ContributionInstaller {
         Files.delete(destFolder.getParentFile().toPath());
       } catch (Exception e) {
         // ignore
-        log.info("The directory is not empty there is another version installed. directory {}",
-          destFolder.getParentFile().toPath(),  e);
+        log.info("The directory is not empty there is another version installed. directory " +
+          destFolder.getParentFile().toPath() + ": " + e.getMessage());
       }
     }
 
@@ -302,16 +301,16 @@ public class ContributionInstaller {
         String indexFileName = FilenameUtils.getName(packageIndexURL.getPath());
         downloadedPackageIndexFilesAccumulator.add(BaseNoGui.indexer.getIndexFile(indexFileName).getName());
 
-        log.info("Start download and signature check of={}", packageIndexURLs);
+        log.info("Start download and signature check of=" + packageIndexURLs);
         downloader.downloadIndexAndSignature(progress, packageIndexURL, progressListener, signatureVerifier);
       } catch (Exception e) {
-        log.error(e.getMessage(), e);
+        log.severe(e.getMessage());
         System.err.println(e.getMessage());
       }
     }
 
     progress.stepDone();
-    log.info("Downloaded package index URL={}", packageIndexURLs);
+    log.info("Downloaded package index URL=" + packageIndexURLs);
     return downloadedPackageIndexFilesAccumulator;
   }
 
@@ -321,11 +320,13 @@ public class ContributionInstaller {
     if (additionalPackageIndexFiles == null) {
       return;
     }
-    log.info("Check unknown files. Additional package index folder files={}, Additional package index url downloaded={}", downloadedPackageIndexFiles, additionalPackageIndexFiles);
+    log.info("Check unknown files. Additional package index folder files=" + downloadedPackageIndexFiles +
+             ", Additional package index url downloaded=" + additionalPackageIndexFiles);
 
     for (File additionalPackageIndexFile : additionalPackageIndexFiles) {
       if (!downloadedPackageIndexFiles.contains(additionalPackageIndexFile.getName())) {
-        log.info("Delete this unknown file={} because not included in this list={}", additionalPackageIndexFile, additionalPackageIndexFiles);
+        log.info("Delete this unknown file=" + additionalPackageIndexFile +
+                 " because not included in this list=" + additionalPackageIndexFiles);
         Files.delete(additionalPackageIndexFile.toPath());
       }
     }

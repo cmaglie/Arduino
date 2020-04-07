@@ -35,7 +35,6 @@ import cc.arduino.contributions.libraries.filters.UpdatableLibraryPredicate;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.filters.UpdatablePlatformPredicate;
 import cc.arduino.view.NotificationPopup;
-import org.apache.logging.log4j.LogManager;
 import processing.app.*;
 
 import javax.swing.*;
@@ -45,6 +44,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.net.URL;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import static processing.app.I18n.tr;
 
@@ -160,12 +160,14 @@ public class ContributionsSelfCheck extends TimerTask implements NotificationPop
 
   private void goToManager(String link) {
     try {
-      ((UpdatableBoardsLibsFakeURLsHandler) hyperlinkListener).openBoardLibManager(new URL(link));
-    }
-      catch (Exception e){
-        LogManager.getLogger(ContributionsSelfCheck.class).warn("Exception while attempting to go to board manager", e);
+      ((UpdatableBoardsLibsFakeURLsHandler) hyperlinkListener)
+          .openBoardLibManager(new URL(link));
+    } catch (Exception e) {
+      Logger.getLogger(ContributionsSelfCheck.class.getName())
+          .warning("Exception while attempting to go to board manager: " + e.getMessage());
     }
   }
+
   // callback for boards button
   public void onOptionalButton1Callback() {
     goToManager(boardsManagerURL);
