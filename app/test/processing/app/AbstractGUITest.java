@@ -29,17 +29,19 @@
 
 package processing.app;
 
-import cc.arduino.files.DeleteFilesOnShutdown;
-import org.fest.swing.edt.FailOnThreadViolationRepaintManager;
-import org.fest.swing.edt.GuiActionRunner;
-import org.fest.swing.edt.GuiQuery;
+import java.util.Random;
+
+import javax.swing.JPopupMenu;
+
+import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
+import org.assertj.swing.edt.GuiActionRunner;
+import org.assertj.swing.edt.GuiQuery;
 import org.junit.After;
 import org.junit.Before;
+
+import cc.arduino.files.DeleteFilesOnShutdown;
 import processing.app.helpers.ArduinoFrameFixture;
 import processing.app.helpers.FileUtils;
-
-import javax.swing.*;
-import java.util.Random;
 
 public abstract class AbstractGUITest {
 
