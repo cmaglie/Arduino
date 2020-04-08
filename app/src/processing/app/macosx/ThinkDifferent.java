@@ -22,14 +22,24 @@
 
 package processing.app.macosx;
 
-import com.apple.eawt.*;
-import com.apple.eawt.AppEvent.AppReOpenedEvent;
+import java.awt.Desktop;
+import java.awt.Desktop.Action;
+import java.awt.desktop.AboutEvent;
+import java.awt.desktop.AboutHandler;
+import java.awt.desktop.AppReopenedEvent;
+import java.awt.desktop.AppReopenedListener;
+import java.awt.desktop.OpenFilesEvent;
+import java.awt.desktop.OpenFilesHandler;
+import java.awt.desktop.PreferencesEvent;
+import java.awt.desktop.PreferencesHandler;
+import java.awt.desktop.QuitEvent;
+import java.awt.desktop.QuitHandler;
+import java.awt.desktop.QuitResponse;
+import java.io.File;
+import java.util.List;
 
 import processing.app.Base;
 import processing.app.Editor;
-
-import java.io.File;
-import java.util.List;
 
 
 /**
@@ -46,24 +56,29 @@ public class ThinkDifferent {
   private static final int MAX_WAIT_FOR_BASE = 30000;
 
   static public void init() {
-    Application application = Application.getApplication();
+    Desktop application = Desktop.getDesktop();
 
-    application.addAppEventListener(new AppReOpenedListener() {
+    boolean isMacOsAboutMenuPresent = application.isSupported(Action.APP_ABOUT);
+    boolean isMacOs1013 = System.getProperty("os.version").startsWith("10.13");
+    System.setProperty("apple.laf.useScreenMenuBar",
+                       String.valueOf(!isMacOs1013 || isMacOsAboutMenuPresent));
+
+    application.addAppEventListener(new AppReopenedListener() {
       @Override
-        public void appReOpened(AppReOpenedEvent aroe) {
-          try {
-            if (Base.INSTANCE.getEditors().size() == 0) {
-              Base.INSTANCE.handleNew();
-            }
-          } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+      public void appReopened(AppReopenedEvent aroe) {
+        try {
+          if (Base.INSTANCE.getEditors().size() == 0) {
+            Base.INSTANCE.handleNew();
           }
+        } catch (Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
       }
     });
     application.setAboutHandler(new AboutHandler() {
       @Override
-      public void handleAbout(AppEvent.AboutEvent aboutEvent) {
+      public void handleAbout(AboutEvent aboutEvent) {
         new Thread(() -> {
           if (waitForBase()) {
             Base.INSTANCE.handleAbout();
@@ -73,7 +88,7 @@ public class ThinkDifferent {
     });
     application.setPreferencesHandler(new PreferencesHandler() {
       @Override
-      public void handlePreferences(AppEvent.PreferencesEvent preferencesEvent) {
+      public void handlePreferences(PreferencesEvent preferencesEvent) {
         new Thread(() -> {
           if (waitForBase()) {
             Base.INSTANCE.handlePrefs();
@@ -83,7 +98,7 @@ public class ThinkDifferent {
     });
     application.setOpenFileHandler(new OpenFilesHandler() {
       @Override
-      public void openFiles(final AppEvent.OpenFilesEvent openFilesEvent) {
+      public void openFiles(final OpenFilesEvent openFilesEvent) {
         new Thread(() -> {
           if (waitForBase()) {
             for (File file : openFilesEvent.getFiles()) {
@@ -104,7 +119,7 @@ public class ThinkDifferent {
     });
     application.setQuitHandler(new QuitHandler() {
       @Override
-      public void handleQuitRequestWith(AppEvent.QuitEvent quitEvent, QuitResponse quitResponse) {
+      public void handleQuitRequestWith(QuitEvent quitEvent, QuitResponse quitResponse) {
         new Thread(() -> {
           if (waitForBase()) {
             if (Base.INSTANCE.handleQuit()) {

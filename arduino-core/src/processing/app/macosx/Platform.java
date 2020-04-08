@@ -22,17 +22,8 @@
 
 package processing.app.macosx;
 
-import cc.arduino.packages.BoardPort;
-import com.apple.eio.FileManager;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.Executor;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.lang3.StringUtils;
-import processing.app.legacy.PApplet;
-import processing.app.legacy.PConstants;
-
-import java.awt.*;
+import java.awt.Desktop;
+import java.awt.Toolkit;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,6 +32,15 @@ import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.lang3.StringUtils;
+
+import cc.arduino.packages.BoardPort;
+import processing.app.legacy.PApplet;
+import processing.app.legacy.PConstants;
 
 /**
  * Platform handler for Mac OS X.
@@ -129,14 +129,10 @@ public class Platform extends processing.app.Platform {
   // Some of these are supposedly constants in com.apple.eio.FileManager,
   // however they don't seem to link properly from Eclipse.
 
-  private static final int kDocumentsFolderType =
-    ('d' << 24) | ('o' << 16) | ('c' << 8) | 's';
-  //static final int kPreferencesFolderType =
-  //  ('p' << 24) | ('r' << 16) | ('e' << 8) | 'f';
-  private static final int kDomainLibraryFolderType =
-    ('d' << 24) | ('l' << 16) | ('i' << 8) | 'b';
-  private static final short kUserDomain = -32763;
-
+  // private static final int kDocumentsFolderType = ('d' << 24) | ('o' << 16) | ('c' << 8) | 's';
+  // private static final int kPreferencesFolderType = ('p' << 24) | ('r' << 16) | ('e' << 8) | 'f';
+  // private static final int kDomainLibraryFolderType = ('d' << 24) | ('l' << 16) | ('i' << 8) | 'b';
+  // private static final short kUserDomain = -32763;
 
   // apple java extensions documentation
   // http://developer.apple.com/documentation/Java/Reference/1.5.0
@@ -153,12 +149,16 @@ public class Platform extends processing.app.Platform {
 
 
   private String getLibraryFolder() throws FileNotFoundException {
-    return FileManager.findFolder(kUserDomain, kDomainLibraryFolderType);
+    return new File(System.getProperty("user.home"), "Library").toString();
+    // TODO: The API below has been removed in JDK 9 without any good replacement
+    //return FileManager.findFolder(kUserDomain, kDomainLibraryFolderType);
   }
 
 
   private String getDocumentsFolder() throws FileNotFoundException {
-    return FileManager.findFolder(kUserDomain, kDocumentsFolderType);
+    return new File(System.getProperty("user.home"), "Documents").toString();
+    // TODO: The API below has been removed in JDK 9 without any good replacement
+    //return FileManager.findFolder(kUserDomain, kDocumentsFolderType);
   }
 
   @Override
