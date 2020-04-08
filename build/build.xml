@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <project name="Arduino" default="build">
+  <property environment="env" />
+
   <!--echo message="os.name = ${os.name}" /-->
   <!--echo message="os.arch = ${os.arch}" /-->
   <!--echo message="os.version = ${os.version}" /-->
@@ -66,7 +68,8 @@
   <condition property="launch4j-download-unpack-target-name" value="launch4j-windows"><os family="windows" /></condition>
   <property name="launch4j-download-unpack-target-name" value="launch4j-linux"/>
 
-  <property name="MACOSX_BUNDLED_JVM" value="${java.home}/../"/>
+  <property name="env.MACOSX_BUNDLED_JVM" value="${java.home}/../" />
+  <property name="MACOSX_BUNDLED_JVM" value="${env.MACOSX_BUNDLED_JVM}" />
   <property name="WINDOWS_BUNDLED_JVM" value="${java.home}"/>
   <property name="LINUX32_BUNDLED_JVM" value="none"/>
   <property name="LINUX64_BUNDLED_JVM" value="none"/>
